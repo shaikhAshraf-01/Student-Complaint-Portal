@@ -1,3 +1,3 @@
-import stdlogin from "./stdlogin.png";
-import adminlogin from "./adminlogin.png";
-export {stdlogin, adminlogin};
+import admin from "./admin.png";
+import student from "./student.png";
+export { admin, student };

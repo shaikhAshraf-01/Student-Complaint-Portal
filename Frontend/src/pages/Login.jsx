@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { stdlogin, adminlogin } from "../assets/images";
+import { admin, student } from "../assets/images";
+import {useNavigate} from "react-router-dom";
 
 const Login = () => {
   const [role, setRole] = useState("student");
+  const navigate = useNavigate();
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+  if(role==="admin"){
+navigate("/admin");
+  }
+  else{
+    navigate("/student");
+  }
+}
 
   return (
     <div className="grid min-h-screen md:grid-cols-2 overflow-hidden">
@@ -24,11 +35,6 @@ const Login = () => {
         >
           {role === "student" ? (
             <>
-              <img
-                src={stdlogin}
-                alt="Student Login"
-                className="mb-6 w-64"
-              />
               <h1 className="text-4xl font-bold">
                 Student Complaint Portal
               </h1>
@@ -36,18 +42,23 @@ const Login = () => {
                 Raise complaints, track status, and communicate with the
                 administration.
               </p>
+              <img
+                src={student}
+                alt="Student Login"
+                className="mb-6 block mx-auto w-80 h-90"
+              />
             </>
           ) : (
             <>
-              <img
-                src={adminlogin}
-                alt="Admin Login"
-                className="mb-6 w-64"
-              />
               <h1 className="text-4xl font-bold">Admin Portal</h1>
               <p className="mt-4 text-lg">
                 Manage complaints, update status, and communicate with students.
               </p>
+              <img
+                src={admin}
+                alt="Admin Login"
+                className="mb-6 block mx-auto w-64"
+              />
             </>
           )}
         </motion.div>
@@ -94,7 +105,7 @@ const Login = () => {
             </button>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium">
                 {role === "student" ? "Roll Number" : "Username"}
