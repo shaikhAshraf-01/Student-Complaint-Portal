@@ -9,10 +9,9 @@ import {
 } from "react-icons/fa";
 
 const navItems = [
-  { to: "studentDashboard", label: "Dashboard", icon: FaChartBar },
-  { to: "allComplaints", label: "Complaints", icon: FaClipboardList },
-  { to: "addComplaint", label: "Add", icon: FaPlusCircle },
-  { to: "studentProfile", label: "Profile", icon: FaUserCircle },
+  { to: "/student", label: "Dashboard", icon: FaChartBar },
+  { to: "/student/addComplaint", label: "Add", icon: FaPlusCircle },
+  { to: "/student/studentProfile", label: "Profile", icon: FaUserCircle },
 ];
 
 function StudentSidebar() {
@@ -20,7 +19,7 @@ function StudentSidebar() {
   const handleLogout = () => navigate("/");
 
   const desktopLinkClass =
-    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-800 hover:text-white group";
+    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all  duration-200 text-black-500 hover:bg-slate-800 hover:text-white group";
   const desktopActiveClass =
     "bg-emerald-600 text-white shadow-md shadow-emerald-900/30 hover:bg-emerald-600";
 
@@ -31,7 +30,7 @@ function StudentSidebar() {
   return (
     <>
       {/* Desktop sidebar — only visible md and up */}
-      <div className="hidden md:flex flex-col justify-between w-64 h-screen p-5 bg-white text-black border-r border-slate-200">
+      <div className="hidden md:flex flex-col justify-between w-64 h-screen p-2 bg-slate-300 text-black border-r border-slate-700">
         <div>
           <div className="flex items-center gap-3 px-2 py-4 mb-8">
             <FaGraduationCap className="text-3xl text-black" />
@@ -39,27 +38,29 @@ function StudentSidebar() {
               Student Portal
             </span>
           </div>
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex  flex-col gap-1.5">
             {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
+                  end={to === "/student"}
+
                 className={({ isActive }) =>
                   `${desktopLinkClass} ${isActive ? desktopActiveClass : ""}`
                 }
               >
                 <Icon className="text-lg transition-transform group-hover:scale-105" />
-                <span className="font-medium text-sm">{label}</span>
+                <span className="font-medium text-lg">{label}</span>
               </NavLink>
             ))}
           </nav>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-rose-400 rounded-xl hover:bg-rose-950/20 transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
+          className="flex items-center gap-3 w-full px-4 py-3 text-red-700 hover:text-black hover:bg-rose-200 rounded-xl  transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
         >
           <FaPowerOff className="text-lg" />
-          <span className="font-medium text-sm">Logout</span>
+          <span className="font-medium text-lg">Logout</span>
         </button>
       </div>
 
@@ -77,13 +78,7 @@ function StudentSidebar() {
             <span className="text-[11px] font-medium">{label}</span>
           </NavLink>
         ))}
-        <button
-          onClick={handleLogout}
-          className=" hidden md:flex flex-col items-center justify-center gap-1 flex-1 py-2 text-slate-400"
-        >
-          <FaPowerOff className="text-xl" />
-          <span className="text-[11px] font-medium">Logout</span>
-        </button>
+       
       </div>
     </>
   );
