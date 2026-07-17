@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { FaClipboardList, FaCheckSquare, FaTimesCircle, FaHourglassHalf } from "react-icons/fa";
 import Complaints from "./Complaints";
+import Chart from "./Chart";
 
 function StudentDashboard() {
   const complaints = useSelector((state) => state.complaints.list);
@@ -77,8 +78,8 @@ function StudentDashboard() {
         </div>
         
         {/* Chart Container (Takes 35% on Desktop screen, Full width on mobile) */}
-        <div className="w-full lg:w-[35%] order-1 lg:order-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 min-h-[260px] md:min-h-[300px]">
-          Hello chart
+        <div className="w-full lg:w-[35%] order-1 lg:order-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 min-h-[260px] md:h-[400px]">
+          <Chart />
         </div>
       </div>
 
