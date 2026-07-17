@@ -10,7 +10,7 @@ import {
 
 const navItems = [
   { to: "/student", label: "Dashboard", icon: FaChartBar },
-  { to: "/student/addComplaint", label: "Add", icon: FaPlusCircle },
+  { to: "/student/addComplaint", label: "Add Complaint", icon: FaPlusCircle },
   { to: "/student/studentProfile", label: "Profile", icon: FaUserCircle },
 ];
 

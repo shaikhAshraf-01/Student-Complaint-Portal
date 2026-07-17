@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { FaClipboardList, FaCheckSquare, FaTimesCircle, FaHourglassHalf } from "react-icons/fa";
-import Complaints from "./Complaints";
-import Chart from "./Chart";
+import Complaints from "./dashboardComponents/Complaints";
+import Chart from "./dashboardComponents/Chart";
 
 function StudentDashboard() {
   const complaints = useSelector((state) => state.complaints.list);

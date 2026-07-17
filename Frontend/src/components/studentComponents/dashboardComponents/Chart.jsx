@@ -28,7 +28,7 @@ export default function Chart() {
     ];
 
   return (
-    <div style={{ width: '100%', height: 400 }}>
+    <div className="w-full h-full">
       <ResponsiveContainer>
         <PieChart>
           <Pie
