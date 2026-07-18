@@ -1,117 +1,75 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { admin, student } from "../assets/images";
 import { useNavigate } from "react-router-dom";
-
-// TEMP: mock "database" of valid students (used to verify identity during registration)
-// Replace with a real API call, e.g. GET /api/students/verify?prn=...&name=...
-const STUDENT_DB = [
-  { prn: "283", fullName: "Ashraf Nabi Shaikh" },
-  { prn: "263", fullName: "Fahim Shehenshah Yadgir" },
-];
-
-// TEMP: mock "database" of students who have completed registration
-// Replace with a real API call, e.g. POST /api/auth/register, POST /api/auth/login
-const REGISTERED_USERS = [
-  // { prn: "2021001", fullName: "Rohan Sharma", password: "test123" }
-];
+import { useDispatch, useSelector } from "react-redux";
+import {
+  verifyStudent,
+  registerUser,
+  loginUser,
+  clearAuthErrors,
+  resetVerification,
+} from "../redux/slices/AuthSlice";
 
 const Login = () => {
-  const [role, setRole] = useState("student");
-  const [authMode, setAuthMode] = useState("login"); // "login" | "register"
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ---------- Login flow state ----------
-  const [loginId, setLoginId] = useState(""); // roll number / username
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
+  const { verifiedStudent, currentUser, role: authRole, loginError, verifyError } =
+    useSelector((state) => state.auth);
 
-  // ---------- Register flow state ----------
+  const [role, setRole] = useState("student");
+  const [authMode, setAuthMode] = useState("login"); // "login" | "register"
+
+  // ---------- Login flow state (UI only) ----------
+  const [loginId, setLoginId] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // ---------- Register flow state (UI only) ----------
   const [prn, setPrn] = useState("");
   const [fullName, setFullName] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
-  const [verifyError, setVerifyError] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [localError, setLocalError] = useState(""); // for password length/match checks
+
+  const isVerified = !!verifiedStudent;
+
+  // ---------- Redirect once login actually succeeds ----------
+  useEffect(() => {
+    if (currentUser && authRole) {
+      navigate(authRole === "admin" ? "/admin" : "/student");
+    }
+  }, [currentUser, authRole, navigate]);
 
   // ---------- Handlers ----------
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoginError("");
-
-    if (role === "admin") {
-      // TODO: replace with real admin auth check
-      navigate("/admin");
-      return;
-    }
-
-    // Student login — check against registered users
-    const user = REGISTERED_USERS.find(
-      (u) => u.prn.trim().toLowerCase() === loginId.trim().toLowerCase()
-    );
-
-    if (!user) {
-      setLoginError("No account found for this Roll Number. Please register first.");
-      return;
-    }
-
-    if (user.password !== loginPassword) {
-      setLoginError("Incorrect password.");
-      return;
-    }
-
-    navigate("/student");
+    dispatch(clearAuthErrors());
+    dispatch(loginUser({ id: loginId, password: loginPassword, role }));
   };
 
   const handleVerify = (e) => {
     e.preventDefault();
-    setVerifyError("");
-
-    const match = STUDENT_DB.find(
-      (s) =>
-        s.prn.trim().toLowerCase() === prn.trim().toLowerCase() &&
-        s.fullName.trim().toLowerCase() === fullName.trim().toLowerCase()
-    );
-
-    if (!match) {
-      setIsVerified(false);
-      setVerifyError("No matching student record found. Check your PRN and full name.");
-      return;
-    }
-
-    const alreadyRegistered = REGISTERED_USERS.some(
-      (u) => u.prn.trim().toLowerCase() === prn.trim().toLowerCase()
-    );
-
-    if (alreadyRegistered) {
-      setIsVerified(false);
-      setVerifyError("This student is already registered. Please log in instead.");
-      return;
-    }
-
-    setIsVerified(true);
+    dispatch(verifyStudent({ prn, fullName }));
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    setVerifyError("");
+    setLocalError("");
 
     if (password.length < 6) {
-      setVerifyError("Password must be at least 6 characters.");
+      setLocalError("Password must be at least 6 characters.");
       return;
     }
     if (password !== confirmPassword) {
-      setVerifyError("Passwords do not match.");
+      setLocalError("Passwords do not match.");
       return;
     }
 
-    // TODO: replace with real API call, e.g. POST /api/auth/register
-    REGISTERED_USERS.push({ prn, fullName, password });
-
+    dispatch(registerUser({ password }));
     setRegisterSuccess(true);
 
-    // Briefly show success, then send them to login with PRN pre-filled
     setTimeout(() => {
       setLoginId(prn);
       switchAuthMode("login");
@@ -122,11 +80,11 @@ const Login = () => {
   const resetAuthState = () => {
     setPrn("");
     setFullName("");
-    setIsVerified(false);
-    setVerifyError("");
     setPassword("");
     setConfirmPassword("");
     setRegisterSuccess(false);
+    setLocalError("");
+    dispatch(resetVerification());
   };
 
   const switchAuthMode = (mode) => {
@@ -139,7 +97,7 @@ const Login = () => {
     switchAuthMode("login");
     setLoginId("");
     setLoginPassword("");
-    setLoginError("");
+    dispatch(clearAuthErrors());
   };
 
   return (
@@ -406,8 +364,8 @@ const Login = () => {
                   </p>
                 )}
 
-                {verifyError && (
-                  <p className="text-sm text-red-600">{verifyError}</p>
+                {(verifyError || localError) && (
+                  <p className="text-sm text-red-600">{verifyError || localError}</p>
                 )}
 
                 {!registerSuccess && (
