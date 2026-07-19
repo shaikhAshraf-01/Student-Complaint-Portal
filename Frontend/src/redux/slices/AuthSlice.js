@@ -2,15 +2,31 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // TEMP mock DB — replace with real API calls later
 const STUDENT_DB = [
-  { prn: "283", fullName: "Ashraf  Shaikh" },
-  { prn: "263", fullName: "Fahim  Yadgir" },
+  { prn: "283", fullName: "Ashraf Shaikh" },
+  { prn: "263", fullName: "Fahim Yadgir" },
 ];
 const ADMIN_CREDENTIALS = {
   username: "SOCMACS",
   password: "admin123",
 };
+const loadRegisteredUsers = () => {
+  try {
+    const saved = localStorage.getItem("registeredUsers");
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveRegisteredUsers = (users) => {
+  try {
+    localStorage.setItem("registeredUsers", JSON.stringify(users));
+  } catch (err) {
+    console.error("Failed to save registered users:", err);
+  }
+};
 const initialState = {
-  registeredUsers: [], // { prn, fullName, password }
+  registeredUsers: loadRegisteredUsers(), // { prn, fullName, password }
   currentUser: null,   // logged-in user (student or admin)
   role: null,           // "student" | "admin"
   verifiedStudent: null, // holds { prn, fullName } once verify succeeds
@@ -51,17 +67,18 @@ const authSlice = createSlice({
       state.verifiedStudent = { prn, fullName };
     },
 
-    registerUser: (state, action) => {
-      const { password } = action.payload;
-      if (!state.verifiedStudent) return;
+  registerUser: (state, action) => {
+  const { password } = action.payload;
+  if (!state.verifiedStudent) return;
 
-      state.registeredUsers.push({
-        ...state.verifiedStudent,
-        password,
-      });
-      state.verifiedStudent = null;
-      state.verifyError = "";
-    },
+  state.registeredUsers.push({
+    ...state.verifiedStudent,
+    password,
+  });
+  saveRegisteredUsers(state.registeredUsers);
+  state.verifiedStudent = null;
+  state.verifyError = "";
+},
 
     loginUser: (state, action) => {
       const { id, password, role } = action.payload;

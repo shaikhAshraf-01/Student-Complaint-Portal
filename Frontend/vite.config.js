@@ -8,4 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+   server: {
+    host: true, // ← this is the key line — exposes the server on your LAN
+  },
 })

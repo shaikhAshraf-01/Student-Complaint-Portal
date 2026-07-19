@@ -137,17 +137,33 @@ const initialComplaints = [
     date: "2026-07-02",
   },
 ];
+const loadComplaints = () => {
+  try {
+    const saved = localStorage.getItem("complaint");
+    return saved ? JSON.parse(saved) : initialComplaints;
+  } catch {
+    return initialComplaints;
+  }
+};
+const saveComplaints = (complaint) => {
+  try {
+    localStorage.setItem("complaint", JSON.stringify(complaint));
+  } catch (err) {
+    console.error("Failed to save complaints:", err);
+  }
+};
 
 const complaintsSlice = createSlice({
   name: "complaints",
   initialState: {
-    list: initialComplaints,
     loading: false,
-    error: null,
+    list:loadComplaints(),
   },
   reducers: {
     addComplaint: (state, action) => {
+      list: loadComplaints(),
       state.list.unshift(action.payload);
+      saveComplaints(state.list);
     },
   },
 });

@@ -19,12 +19,12 @@ function StudentSidebar() {
   const handleLogout = () => navigate("/");
 
   const desktopLinkClass =
-    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all  duration-200 text-black-500 hover:bg-slate-800 hover:text-white group";
+    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-black-500 hover:bg-slate-800 hover:text-white group";
   const desktopActiveClass =
     "bg-emerald-600 text-white shadow-md shadow-emerald-900/30 hover:bg-emerald-600";
 
   const mobileLinkClass =
-    "flex flex-col items-center justify-center gap-1 flex-1 py-2 text-slate-500";
+    "relative flex flex-col items-center justify-center gap-1 flex-1 py-2 text-slate-500 transition-all duration-200 active:scale-90 active:bg-slate-100";
   const mobileActiveClass = "text-emerald-600";
 
   return (
@@ -38,13 +38,12 @@ function StudentSidebar() {
               Student Portal
             </span>
           </div>
-          <nav className="flex  flex-col gap-1.5">
+          <nav className="flex flex-col gap-1.5">
             {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
-                  end={to === "/student"}
-
+                end={to === "/student"}
                 className={({ isActive }) =>
                   `${desktopLinkClass} ${isActive ? desktopActiveClass : ""}`
                 }
@@ -57,7 +56,7 @@ function StudentSidebar() {
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-red-700 hover:text-black hover:bg-rose-200 rounded-xl  transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
+          className="flex items-center gap-3 w-full px-4 py-3 text-red-700 hover:text-black hover:bg-rose-200 rounded-xl transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
         >
           <FaPowerOff className="text-lg" />
           <span className="font-medium text-lg">Logout</span>
@@ -70,15 +69,33 @@ function StudentSidebar() {
           <NavLink
             key={to}
             to={to}
+            end={to === "/student"}
             className={({ isActive }) =>
               `${mobileLinkClass} ${isActive ? mobileActiveClass : ""}`
             }
           >
-            <Icon className="text-xl" />
-            <span className="text-[11px] font-medium">{label}</span>
+            {({ isActive }) => (
+              <>
+                {/* top indicator bar for active tab */}
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-emerald-600" />
+                )}
+                <Icon
+                  className={`text-xl transition-transform duration-200 ${
+                    isActive ? "scale-110" : ""
+                  }`}
+                />
+                <span
+                  className={`text-[11px] transition-all duration-200 ${
+                    isActive ? "font-semibold" : "font-medium"
+                  }`}
+                >
+                  {label}
+                </span>
+              </>
+            )}
           </NavLink>
         ))}
-       
       </div>
     </>
   );
