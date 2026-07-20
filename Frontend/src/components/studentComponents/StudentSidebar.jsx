@@ -19,7 +19,6 @@ const navItems = [
 function StudentSidebar() {
   const dispatch =useDispatch();
   const navigate = useNavigate();
-  const dispatch=useDispatch();
   const handleLogout = () => {
     dispatch(logout())
     navigate("/");}

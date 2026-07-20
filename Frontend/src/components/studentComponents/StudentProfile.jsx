@@ -1,10 +1,20 @@
-import { FaUserCircle, FaIdBadge, FaGraduationCap, FaEnvelope, FaPhone, FaPen } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { FaUserCircle, FaIdBadge, FaGraduationCap, FaEnvelope, FaPhone, FaPen, FaPowerOff } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../redux/slices/AuthSlice"; // adjust path if needed
 
 function StudentProfile() {
-  const {currentUser} = useSelector((state)=>state.auth);
+  const { currentUser } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   const studentData = {
-    name:`${currentUser.fullName}`,
+    name: `${currentUser.fullName}`,
     studentId: `${currentUser.prn}`,
     semester: `${currentUser.semester}`,
     department: "Bachelor of Computer Applications",
@@ -21,9 +31,21 @@ function StudentProfile() {
 
   return (
     <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-auto px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
-      <header className="border-b border-slate-400 pb-2 shrink-0">
-        <h1 className="text-2xl text-purple-700 font-bold">My Profile</h1>
-        <p>View your account information</p>
+      <header className="border-b border-slate-400 pb-2 shrink-0 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl text-purple-700 font-bold">My Profile</h1>
+          <p>View your account information</p>
+        </div>
+
+        {/* Logout — mobile/tablet only, desktop already has it in the sidebar */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="md:hidden flex items-center gap-2 text-red-700 hover:text-white hover:bg-rose-600 border border-rose-200 px-3 py-2 rounded-lg transition-colors duration-200 text-sm font-medium shrink-0"
+        >
+          <FaPowerOff className="text-sm" />
+          Logout
+        </button>
       </header>
 
       {/* Profile Card */}
