@@ -1,10 +1,12 @@
 import { FaUserCircle, FaIdBadge, FaGraduationCap, FaEnvelope, FaPhone, FaPen } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 function StudentProfile() {
+  const {currentUser} = useSelector((state)=>state.auth);
   const studentData = {
-    name: "Ashraf Shaikh",
-    studentId: "PRN-283",
-    semester: "BCA III - Semester 6",
+    name:`${currentUser.fullName}`,
+    studentId: `${currentUser.prn}`,
+    semester: `${currentUser.semester}`,
     department: "Bachelor of Computer Applications",
     email: "ashraf.shaikh@example.edu",
     mobile: "+91 98765 43210",
