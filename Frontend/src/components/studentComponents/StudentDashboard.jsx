@@ -3,8 +3,11 @@ import { FaClipboardList, FaCheckSquare, FaTimesCircle, FaHourglassHalf } from "
 import Complaints from "./dashboardComponents/Complaints";
 import Chart from "./dashboardComponents/Chart";
 
+
 function StudentDashboard() {
   const complaints = useSelector((state) => state.complaints.list);
+  const {currentUser}=useSelector((state)=>state.auth);
+
 
   const total = complaints.length;
   const inProgress = complaints.filter(c => c.status === "In Progress").length;
@@ -15,7 +18,7 @@ function StudentDashboard() {
     <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-hidden px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
 
       <header className="mb-1">
-        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Welcome Back, Ashraf Shaikh 👋</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Welcome Back, {currentUser.fullName || "Student"} 👋</h1>
         <p className="text-xs md:text-sm text-slate-500 mt-1">Here's what's happening with your complaints today.</p>
       </header>
 

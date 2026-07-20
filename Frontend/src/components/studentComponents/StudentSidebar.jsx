@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import{ logout} from "../../redux/slices/AuthSlice"
+import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import {
   FaGraduationCap,
@@ -19,10 +19,11 @@ const navItems = [
 function StudentSidebar() {
   const dispatch =useDispatch();
   const navigate = useNavigate();
+  const dispatch=useDispatch();
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
-  };
+    dispatch(logout())
+    navigate("/");}
+
   const desktopLinkClass =
     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-black-500 hover:bg-slate-800 hover:text-white group";
   const desktopActiveClass =
