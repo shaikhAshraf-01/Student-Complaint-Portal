@@ -1,13 +1,15 @@
 import AdminSidebar from "../components/adminComponents/AdminSidebar";
-import AdminDashboard from "../components/adminComponents/AdminDashboard";
+import { Outlet } from "react-router-dom";
+
 function AdminLayout() {
   return (
-    <div className="w-full h-screen grid grid-cols-2 ">
-      <div>
-        <AdminSidebar />
+    <div className="w-full h-screen flex flex-col md:flex-row">
+      <AdminSidebar />
+      <div className="flex-1 overflow-y-auto pb-16 md:pb-0">
+        <Outlet />
       </div>
-      <AdminDashboard/>
     </div>
   );
 }
+
 export default AdminLayout;

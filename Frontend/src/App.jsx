@@ -1,9 +1,14 @@
 import Login from "./pages/Login";
-import AdminLayout from "./layouts/AdminLayout";
+ {/* Student — files */}
 import StudentLayout from "./layouts/StudentLayout";
 import StudentDashboard from "./components/studentComponents/StudentDashboard";
 import AddComplaint from "./components/studentComponents/AddComplaint";
 import StudentProfile from "./components/studentComponents/StudentProfile";
+ {/* Admin — Files */}
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboard from "./components/adminComponents/AdminDashboard"
+import AllComplaints from "./components/adminComponents/AllComplaints"
+ {/*  protected route */}
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -15,7 +20,11 @@ function App() {
 
         {/* Admin — protected */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-          <Route path="/admin" element={<AdminLayout />} />
+          <Route path="/admin" element={<AdminLayout />} >
+          <Route index element={<AdminDashboard/>}/>
+           <Route path="allComplaints" element={<AllComplaints />} />
+
+        </Route>
         </Route>
 
         {/* Student — protected, nested routes preserved */}
