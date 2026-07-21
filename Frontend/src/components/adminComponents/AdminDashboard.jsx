@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { FaClipboardList, FaCheckSquare, FaTimesCircle, FaHourglassHalf } from "react-icons/fa";
-
+import RecentComplaint from "./dashboardComponent/RecentComplaints";
+import Chart from "./dashboardComponent/Chart";
 
 function AdminDashboard() {
   const complaints = useSelector((state) => state.complaints.list);
@@ -61,9 +62,21 @@ function AdminDashboard() {
           </div>
         </div>
       </div>
+     <div className="flex flex-col lg:flex-row py-6 gap-6">
 
-     
+        <div className="w-full lg:w-[65%] order-2 lg:order-1">
+      <RecentComplaint/>
+          
+        </div>
 
+        {/* FIX: changed min-h-[260px] to h-[260px] so ResponsiveContainer's h-full has
+            a definite height to resolve against on mobile screens */}
+        <div className="w-full lg:w-[35%] order-1 lg:order-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 h-[260px] md:h-[400px]">
+          <Chart />
+        </div>
+      </div>
+
+    
     </div>
   );
 }

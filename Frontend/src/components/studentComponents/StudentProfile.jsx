@@ -16,7 +16,7 @@ function StudentProfile() {
   const studentData = {
     name: `${currentUser.fullName}`,
     studentId: `${currentUser.prn}`,
-    semester: `${currentUser.semester}`,
+    semester: "IV",
     department: "Bachelor of Computer Applications",
     email: "ashraf.shaikh@example.edu",
     mobile: "+91 98765 43210",
