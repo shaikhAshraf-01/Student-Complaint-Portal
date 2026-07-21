@@ -1,6 +1,71 @@
- function AdminDashboard(){
-    return(
-        <div>hello admin</div>
-    )
+import { useSelector } from "react-redux";
+import { FaClipboardList, FaCheckSquare, FaTimesCircle, FaHourglassHalf } from "react-icons/fa";
+
+
+function AdminDashboard() {
+  const complaints = useSelector((state) => state.complaints.list);
+
+
+  const total = complaints.length;
+  const inProgress = complaints.filter(c => c.status === "In Progress").length;
+  const resolved = complaints.filter(c => c.status === "Resolved").length;
+  const rejected = complaints.filter(c => c.status === "Rejected").length;
+
+  return (
+    <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-hidden px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
+
+      <header className="mb-1">
+        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Welcome Back, Admin 👋</h1>
+        <p className="text-xs md:text-sm text-slate-500 mt-1">Here's what's happening with your complaints today.</p>
+      </header>
+
+      <div className="hidden md:grid lg:grid-cols-4 gap-4 md:gap-6 mt-4">
+
+        <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 bg-white rounded-xl shadow-xs border border-slate-100">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-xl text-purple-700 shrink-0">
+            <FaClipboardList className="text-lg md:text-xl" />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <h2 className="text-xs md:text-sm font-medium text-slate-500 tracking-wide truncate">Total</h2>
+            <p className="text-xl md:text-2xl font-bold text-slate-900 leading-none">{total}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 bg-white rounded-xl shadow-xs border border-slate-100">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-xl text-amber-600 shrink-0">
+            <FaHourglassHalf className="text-lg md:text-xl" />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <h2 className="text-xs md:text-sm font-medium text-slate-500 tracking-wide truncate">In Progress</h2>
+            <p className="text-xl md:text-2xl font-bold text-slate-900 leading-none">{inProgress}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 bg-white rounded-xl shadow-xs border border-slate-100">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-xl text-emerald-700 shrink-0">
+            <FaCheckSquare className="text-lg md:text-xl" />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <h2 className="text-xs md:text-sm font-medium text-slate-500 tracking-wide truncate">Resolved</h2>
+            <p className="text-xl md:text-2xl font-bold text-slate-900 leading-none">{resolved}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 bg-white rounded-xl shadow-xs border border-slate-100">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-rose-50 rounded-xl text-rose-700 shrink-0">
+            <FaTimesCircle className="text-lg md:text-xl" />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <h2 className="text-xs md:text-sm font-medium text-slate-500 tracking-wide truncate">Rejected</h2>
+            <p className="text-xl md:text-2xl font-bold text-slate-900 leading-none">{rejected}</p>
+          </div>
+        </div>
+      </div>
+
+     
+
+    </div>
+  );
 }
+
 export default AdminDashboard;

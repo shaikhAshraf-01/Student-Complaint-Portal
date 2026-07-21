@@ -25,10 +25,26 @@ const saveRegisteredUsers = (users) => {
     console.error("Failed to save registered users:", err);
   }
 };
+const loadCurrentUser = () => {
+  try {
+    const saved = localStorage.getItem("currentUser");
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
+const loadRole = () => {
+  try {
+    return localStorage.getItem("role") || null;
+  } catch {
+    return null;
+  }
+};
 const initialState = {
   registeredUsers: loadRegisteredUsers(), // { prn, fullName, password }
-  currentUser: null,   // logged-in user (student or admin)
-  role: null,           // "student" | "admin"
+  currentUser: loadCurrentUser(),   // logged-in user (student or admin)
+  role: loadRole(),           // "student" | "admin"
   verifiedStudent: null, // holds { prn, fullName } once verify succeeds
   loginError: "",
   verifyError: "",
@@ -80,11 +96,11 @@ const authSlice = createSlice({
   state.verifyError = "";
 },
 
-    loginUser: (state, action) => {
-      const { id, password, role } = action.payload;
-      state.loginError = "";
+   loginUser: (state, action) => {
+  const { id, password, role } = action.payload;
+  state.loginError = "";
 
-       if (role === "admin") {
+  if (role === "admin") {
     if (
       id.trim().toLowerCase() !== ADMIN_CREDENTIALS.username.toLowerCase() ||
       password !== ADMIN_CREDENTIALS.password
@@ -92,32 +108,38 @@ const authSlice = createSlice({
       state.loginError = "Invalid admin username or password.";
       return;
     }
-
     state.currentUser = { username: id, role: "admin" };
     state.role = "admin";
+    localStorage.setItem("currentUser", JSON.stringify(state.currentUser)); // ← add
+    localStorage.setItem("role", "admin"); // ← add
     return;
   }
-      const user = state.registeredUsers.find(
-        (u) => u.prn.trim().toLowerCase() === id.trim().toLowerCase()
-      );
 
-      if (!user) {
-        state.loginError = "No account found for this Roll Number. Please register first.";
-        return;
-      }
-      if (user.password !== password) {
-        state.loginError = "Incorrect password.";
-        return;
-      }
+  const user = state.registeredUsers.find(
+    (u) => u.prn.trim().toLowerCase() === id.trim().toLowerCase()
+  );
 
-      state.currentUser = user;
-      state.role = "student";
-    },
+  if (!user) {
+    state.loginError = "No account found for this Roll Number. Please register first.";
+    return;
+  }
+  if (user.password !== password) {
+    state.loginError = "Incorrect password.";
+    return;
+  }
 
-    logout: (state) => {
-      state.currentUser = null;
-      state.role = null;
-    },
+  state.currentUser = user;
+  state.role = "student";
+  localStorage.setItem("currentUser", JSON.stringify(user)); // ← add
+  localStorage.setItem("role", "student"); // ← add
+},
+
+logout: (state) => {
+  state.currentUser = null;
+  state.role = null;
+  localStorage.removeItem("currentUser"); // ← add
+  localStorage.removeItem("role"); // ← add
+},
 
     clearAuthErrors: (state) => {
       state.loginError = "";
