@@ -58,10 +58,17 @@ const Login = () => {
     e.preventDefault();
     setLocalError("");
 
-    if (password.length < 6) {
-      setLocalError("Password must be at least 6 characters.");
-      return;
-    }
+    // Regular expression to check for:
+// (?=.*[A-Z]) -> At least one uppercase letter
+// (?=.*\d)    -> At least one number
+// (?=.*[!@#$%^&*(),.?":{}|<>]) -> At least one special character
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+
+if (!passwordRegex.test(password)) {
+  setLocalError("Password must be at least 6 characters and include one uppercase letter, one number, and one special character.");
+  return;
+}
+
     if (password !== confirmPassword) {
       setLocalError("Passwords do not match.");
       return;

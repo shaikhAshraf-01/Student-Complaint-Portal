@@ -5,14 +5,17 @@ import Chart from "./dashboardComponents/Chart";
 
 
 function StudentDashboard() {
-  const complaints = useSelector((state) => state.complaints.list);
-  const {currentUser}=useSelector((state)=>state.auth);
+   const allComplaints = useSelector((state) => state.complaints.list);
+  const { currentUser } = useSelector((state) => state.auth);
 
-
-  const total = complaints.length;
-  const inProgress = complaints.filter(c => c.status === "In Progress").length;
-  const resolved = complaints.filter(c => c.status === "Resolved").length;
-  const rejected = complaints.filter(c => c.status === "Rejected").length;
+  // 1. FILTER: Isolate complaints belonging strictly to the logged-in student's PRN
+  const studentComplaints = allComplaints.filter(
+    (c) => c.stdPRN === currentUser?.prn
+  );
+  const total = studentComplaints.length;
+  const inProgress = studentComplaints.filter(c => c.status === "In Progress").length;
+  const resolved = studentComplaints.filter(c => c.status === "Resolved").length;
+  const rejected = studentComplaints.filter(c => c.status === "Rejected").length;
 
   return (
     <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-hidden px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
@@ -68,7 +71,7 @@ function StudentDashboard() {
       <div className="flex flex-col lg:flex-row py-6 gap-6">
 
         <div className="w-full lg:w-[65%] order-2 lg:order-1">
-          <Complaints data={complaints} />
+          <Complaints data={studentComplaints} />
         </div>
 
         {/* FIX: changed min-h-[260px] to h-[260px] so ResponsiveContainer's h-full has

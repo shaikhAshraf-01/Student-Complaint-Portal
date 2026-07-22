@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialComplaints = [
   {
     id: 1,
+    stdPRN: '283',
     title: "Hostel Wi-Fi down in Block B",
     category: "Infrastructure",
     description:
@@ -12,6 +13,8 @@ const initialComplaints = [
   },
   {
     id: 2,
+    stdPRN: '283',
+
     title: "Library water cooler leaking",
     category: "Maintenance",
     description:
@@ -21,6 +24,8 @@ const initialComplaints = [
   },
   {
     id: 3,
+        stdPRN: '283',
+
     title: "Mess food quality issue",
     category: "Canteen & Mess",
     description:
@@ -30,6 +35,8 @@ const initialComplaints = [
   },
   {
     id: 4,
+        stdPRN: '283',
+
     title: "Gym equipment dumbbell rack broken",
     category: "Sports & Gym",
     description:
@@ -39,6 +46,8 @@ const initialComplaints = [
   },
   {
     id: 5,
+        stdPRN: '283',
+
     title: "Lab 3 projector not turning on",
     category: "Academic Facilities",
     description:
@@ -48,6 +57,8 @@ const initialComplaints = [
   },
   {
     id: 6,
+        stdPRN: '283',
+
     title: "AC malfunctioning in Seminar Hall",
     category: "Infrastructure",
     description:
@@ -57,6 +68,8 @@ const initialComplaints = [
   },
   {
     id: 7,
+        stdPRN: '283',
+
     title: "Broken window pane in Room 102",
     category: "Maintenance",
     description:
@@ -65,7 +78,9 @@ const initialComplaints = [
     date: "2026-07-10",
   },
   {
-    id: 8,
+    id: 8,   
+     stdPRN: '263',
+
     title: "Street light flickering near main gate",
     category: "Security",
     description:
@@ -75,6 +90,8 @@ const initialComplaints = [
   },
   {
     id: 9,
+         stdPRN: '263',
+
     title: "Elevator stuck in Admin Building",
     category: "Infrastructure",
     description:
@@ -84,6 +101,8 @@ const initialComplaints = [
   },
   {
     id: 10,
+         stdPRN: '263',
+
     title: "Parking lot drain blocked",
     category: "Maintenance",
     description:
@@ -93,6 +112,8 @@ const initialComplaints = [
   },
   {
     id: 11,
+         stdPRN: '263',
+
     title: "No water supply in Washroom 2nd floor",
     category: "Maintenance",
     description:
@@ -102,6 +123,8 @@ const initialComplaints = [
   },
   {
     id: 12,
+         stdPRN: '263',
+
     title: "Canteen overcharging for beverages",
     category: "Canteen & Mess",
     description:
@@ -111,6 +134,8 @@ const initialComplaints = [
   },
   {
     id: 13,
+         stdPRN: '263',
+
     title: "Socket spark in Computer Lab 1",
     category: "Electrical",
     description:
@@ -120,6 +145,8 @@ const initialComplaints = [
   },
   {
     id: 14,
+         stdPRN: '263',
+
     title: "ID card printer out of ink",
     category: "Administration",
     description:
@@ -129,6 +156,8 @@ const initialComplaints = [
   },
   {
     id: 15,
+         stdPRN: '263',
+
     title: "Auditorium sound system crackling",
     category: "Academic Facilities",
     description:
@@ -145,13 +174,7 @@ const loadComplaints = () => {
     return initialComplaints;
   }
 };
-const saveComplaints = (complaint) => {
-  try {
-    localStorage.setItem("complaint", JSON.stringify(complaint));
-  } catch (err) {
-    console.error("Failed to save complaints:", err);
-  }
-};
+
 
 const complaintsSlice = createSlice({
   name: "complaints",
@@ -161,9 +184,7 @@ const complaintsSlice = createSlice({
   },
   reducers: {
     addComplaint: (state, action) => {
-      list: loadComplaints(),
       state.list.unshift(action.payload);
-      saveComplaints(state.list);
     },
   },
 });
