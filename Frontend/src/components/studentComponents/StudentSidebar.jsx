@@ -8,11 +8,13 @@ import {
   FaClipboardList,
   FaPlusCircle,
   FaUserCircle,
+  FaEnvelopeOpenText
 } from "react-icons/fa";
 
 const navItems = [
   { to: "/student", label: "Dashboard", icon: FaChartBar },
   { to: "/student/addComplaint", label: "Add Complaint", icon: FaPlusCircle },
+  { to: "/student/responses", label: "Responses", icon: FaEnvelopeOpenText },
   { to: "/student/studentProfile", label: "Profile", icon: FaUserCircle },
 ];
 

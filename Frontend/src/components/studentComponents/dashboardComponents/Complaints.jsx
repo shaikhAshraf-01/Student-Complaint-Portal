@@ -11,13 +11,11 @@ const FILTERS = [
 function Complaints({ data }) {
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // 1. Correctly calculates filtered lists from your active student dashboard prop data
   const filteredData = useMemo(() => {
     if (activeFilter === "All") return data;
     return data.filter((item) => item.status === activeFilter);
   }, [data, activeFilter]);
 
-  // 2. FIXED: This now runs strictly on the filtered student array passed from the parent dashboard
   const getCount = (key) =>
     key === "All" ? data.length : data.filter((item) => item.status === key).length;
 
@@ -31,9 +29,8 @@ function Complaints({ data }) {
             <h3 className="text-base md:text-lg font-bold text-slate-900">Recent Complaints</h3>
             <p className="text-[11px] md:text-xs text-slate-500 mt-0.5">Showing your submitted grievances</p>
           </div>
-          {/* FIXED text to match what is currently visible on the screen */}
           <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full shrink-0">
-            {filteredData.length} {activeFilter === "All" ? "Total" : activeFilter}
+            {filteredData.length} Total
           </span>
         </div>
 

@@ -4,6 +4,7 @@ import StudentLayout from "./layouts/StudentLayout";
 import StudentDashboard from "./components/studentComponents/StudentDashboard";
 import AddComplaint from "./components/studentComponents/AddComplaint";
 import StudentProfile from "./components/studentComponents/StudentProfile";
+import Responses from "./components/studentComponents/Responses";
  {/* Admin — Files */}
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./components/adminComponents/AdminDashboard"
@@ -32,6 +33,7 @@ function App() {
           <Route path="/student" element={<StudentLayout />}>
             <Route index element={<StudentDashboard />} />
             <Route path="addComplaint" element={<AddComplaint />} />
+            <Route path="responses" element={<Responses />} />
             <Route path="studentProfile" element={<StudentProfile />} />
           </Route>
         </Route>
