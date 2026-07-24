@@ -16,7 +16,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout, changePassword } from "../../redux/slices/AuthSlice"; // adjust path if needed
-import { raiseRequest } from "../../redux/slices/editRequestSlice"; // adjust path if needed
+import { raiseRequest } from "../../redux/slices/EditRequestSlice"; // adjust path if needed
 
 const REQUESTABLE_FIELDS = [
   { key: "fullName", label: "Full Name" },

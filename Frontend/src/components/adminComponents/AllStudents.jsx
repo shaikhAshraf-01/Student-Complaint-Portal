@@ -12,7 +12,7 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { updateStudentField } from "../../redux/slices/AuthSlice"; // adjust path
-import { approveRequest, rejectRequest } from "../../redux/slices/editRequestSlice"; // adjust path
+import { approveRequest, rejectRequest } from "../../redux/slices/EditRequestSlice"; // adjust path
 
 // Maps a ticket "field" key to a friendly label
 const FIELD_LABELS = {

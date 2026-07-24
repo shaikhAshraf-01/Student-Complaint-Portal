@@ -17,7 +17,7 @@ const saveRequests = (list) => {
   }
 };
 
-const editRequestSlice = createSlice({
+const EditRequestSlice = createSlice({
   name: "editRequests",
   initialState: {
     list: loadRequests(), // { id, prn, studentName, field, oldValue, newValue, status, date }
