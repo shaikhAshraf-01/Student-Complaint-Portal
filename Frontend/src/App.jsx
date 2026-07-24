@@ -9,6 +9,8 @@ import Responses from "./components/studentComponents/Responses";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./components/adminComponents/AdminDashboard"
 import AllComplaints from "./components/adminComponents/AllComplaints"
+import AllStudents from "./components/adminComponents/AllStudents"
+import AdminProfile from "./components/adminComponents/AdminProfile"
  {/*  protected route */}
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -24,6 +26,8 @@ function App() {
           <Route path="/admin" element={<AdminLayout />} >
           <Route index element={<AdminDashboard/>}/>
            <Route path="allComplaints" element={<AllComplaints />} />
+           <Route path="allStudents" element={<AllStudents />} />
+           <Route path="adminProfile" element={<AdminProfile />} />
 
         </Route>
         </Route>
