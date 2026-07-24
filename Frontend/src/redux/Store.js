@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import complaintsReducer from "./slices/ComplaintSlice";
 import authReducer from "./slices/AuthSlice"
-import editRequestReducer from "./slices/EditRequestSlice"
+import editRequestReducer from "./slices/editRequestSlice"
 
 export const store = configureStore({
   reducer: {

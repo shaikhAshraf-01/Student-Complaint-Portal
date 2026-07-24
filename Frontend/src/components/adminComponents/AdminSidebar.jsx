@@ -63,7 +63,7 @@ function AdminSidebar() {
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center md:hidden gap-3 w-full px-4 py-3 text-red-700 hover:text-black hover:bg-rose-200 rounded-xl transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
+          className="flex items-center gap-3 w-full px-4 py-3 text-red-700 hover:text-black hover:bg-rose-200 rounded-xl transition-colors duration-200 mt-auto border border-transparent hover:border-rose-900/30"
         >
           <FaPowerOff className="text-lg" />
           <span className="font-medium text-lg">Logout</span>
