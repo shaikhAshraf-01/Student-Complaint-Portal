@@ -57,5 +57,5 @@ const EditRequestSlice = createSlice({
 });
 
 export const { raiseRequest, approveRequest, rejectRequest } =
-  editRequestSlice.actions;
-export default editRequestSlice.reducer;
+  EditRequestSlice.actions;
+export default EditRequestSlice.reducer;
