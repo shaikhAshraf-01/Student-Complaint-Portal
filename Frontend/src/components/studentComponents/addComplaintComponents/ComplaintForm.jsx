@@ -43,46 +43,47 @@ function ComplaintForm() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!title.trim() || !description.trim() || !location.trim() || !category) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    if (!readRules) {
-      setError("You must confirm you've read the rules before submitting.");
-      return;
-    }
+  if (!title.trim() || !description.trim() || !location.trim() || !category) {
+    setError("Please fill in all fields.");
+    return;
+  }
+  if (!readRules) {
+    setError("You must confirm you've read the rules before submitting.");
+    return;
+  }
 
-    const newComplaint = {
-      id: Date.now(),
-      title: title.trim(),
-      description: description.trim(),
-      location: location.trim(),
-      category,
-      documents: documents.map((f) => f.name),
-      status: "In Progress",
-      date: new Date().toISOString().split("T")[0],
-      submittedBy: currentUser?.fullName || currentUser?.prn || "Unknown",
-    };
-
-    dispatch(addComplaint(newComplaint));
-
-    // reset form
-    setTitle("");
-    setDescription("");
-    setLocation("");
-    setCategory("");
-    setDocuments([]);
-    setReadRules(false);
-    setSubmitted(true);
-
-    if (cameraInputRef.current) cameraInputRef.current.value = "";
-    if (fileInputRef.current) fileInputRef.current.value = "";
-
-    setTimeout(() => setSubmitted(false), 2000);
+  const newComplaint = {
+    id: Date.now(),
+    stdPRN: currentUser?.prn || "283", // <--- ADD THIS LINE!
+    title: title.trim(),
+    description: description.trim(),
+    location: location.trim(),
+    category,
+    documents: documents.map((f) => f.name),
+    status: "In Progress",
+    date: new Date().toISOString().split("T")[0],
+    submittedBy: currentUser?.fullName || "Unknown",
   };
+
+  dispatch(addComplaint(newComplaint));
+
+  // Reset form state...
+  setTitle("");
+  setDescription("");
+  setLocation("");
+  setCategory("");
+  setDocuments([]);
+  setReadRules(false);
+  setSubmitted(true);
+
+  if (cameraInputRef.current) cameraInputRef.current.value = "";
+  if (fileInputRef.current) fileInputRef.current.value = "";
+
+  setTimeout(() => setSubmitted(false), 2000);
+};
 
   return (
     <div>
