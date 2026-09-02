@@ -247,6 +247,7 @@ if (!passwordRegex.test(password)) {
                   <input
                     type="text"
                     value={loginId}
+                    maxLength={10}
                     onChange={(e) => setLoginId(e.target.value)}
                     placeholder={
                       role === "student" ? "Enter Roll Number" : "Enter Username"
@@ -261,6 +262,8 @@ if (!passwordRegex.test(password)) {
                   </label>
                   <input
                     type="password"
+                    minLength={6}
+                    maxLength={14}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Enter Password"
@@ -301,6 +304,7 @@ if (!passwordRegex.test(password)) {
                   <input
                     type="text"
                     value={prn}
+                    maxLength={12}
                     onChange={(e) => setPrn(e.target.value)}
                     disabled={isVerified}
                     placeholder="Enter PRN Number"
@@ -315,6 +319,7 @@ if (!passwordRegex.test(password)) {
                   <input
                     type="text"
                     value={fullName}
+                    maxLength={32}
                     onChange={(e) => setFullName(e.target.value)}
                     disabled={isVerified}
                     placeholder="Enter Full Name"
@@ -343,6 +348,8 @@ if (!passwordRegex.test(password)) {
                         <input
                           type="password"
                           value={password}
+                          minLength={6}
+                          maxLength={14}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter Password"
                           className="w-full rounded-lg border px-4 py-3 outline-none transition-all duration-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
@@ -356,6 +363,8 @@ if (!passwordRegex.test(password)) {
                         <input
                           type="password"
                           value={confirmPassword}
+                          minLength={6}
+                          maxLength={14}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Re-enter Password"
                           className="w-full rounded-lg border px-4 py-3 outline-none transition-all duration-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
