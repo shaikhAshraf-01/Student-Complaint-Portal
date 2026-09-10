@@ -263,7 +263,7 @@ if (!passwordRegex.test(password)) {
                   <input
                     type="password"
                     minLength={6}
-                    maxLength={14}
+                    maxLength={12}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Enter Password"
