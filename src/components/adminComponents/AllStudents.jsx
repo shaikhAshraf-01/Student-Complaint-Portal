@@ -85,8 +85,6 @@ export default function AllStudents() {
     );
   });
 
-  const pendingRequests = requests.filter((r) => r.status === "Pending");
-
   const studentRequests = (prn) =>
     requests.filter((r) => r.prn === prn).sort((a, b) => (a.date < b.date ? 1 : -1));
 
@@ -107,7 +105,6 @@ export default function AllStudents() {
 
   return (
     <div className="p-4 md:p-6 relative">
-      {/* Header Section */}
       <div className="mb-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold">All Students</h1>
@@ -116,10 +113,9 @@ export default function AllStudents() {
           </p>
         </div>
 
-        {/* Search Bar & Button Row */}
+        {/* Height Fixed Search Box and Add Button */}
         <div className="flex items-center justify-between gap-2.5">
-          {/* Equal Height Search Box */}
-          <div className="relative flex-1 max-w-xs sm:max-w-xs">
+          <div className="relative flex-1 max-w-xs">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm" />
             <input
               value={search}
@@ -129,7 +125,6 @@ export default function AllStudents() {
             />
           </div>
 
-          {/* Equal Height Add Button */}
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="h-10 flex items-center justify-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs sm:text-sm px-3.5 rounded-lg shadow-sm transition whitespace-nowrap"
@@ -140,9 +135,7 @@ export default function AllStudents() {
         </div>
       </div>
 
-      {/* Student List View */}
       <div className="bg-white rounded-xl shadow border overflow-hidden">
-        {/* Table Header (Desktop Only) */}
         <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
           <div className="col-span-1">PRN</div>
           <div className="col-span-2">Name</div>
@@ -154,7 +147,6 @@ export default function AllStudents() {
           <div className="col-span-1 text-right">Details</div>
         </div>
 
-        {/* Rows / Cards */}
         <div className="divide-y">
           {filteredStudents.length === 0 ? (
             <div className="p-8 text-center text-gray-500 text-sm">
@@ -170,12 +162,10 @@ export default function AllStudents() {
                   key={s.prn}
                   className="flex items-center justify-between p-4 md:grid md:grid-cols-12 md:gap-4 md:px-5 md:py-4 hover:bg-gray-50 transition"
                 >
-                  {/* PRN Desktop */}
                   <div className="hidden md:block col-span-1 text-gray-600 text-sm">
                     {s.prn}
                   </div>
 
-                  {/* Name & PRN Mobile */}
                   <div className="md:col-span-2">
                     <p className="font-medium text-sm flex items-center gap-1.5">
                       {s.fullName}
@@ -191,7 +181,6 @@ export default function AllStudents() {
                     </p>
                   </div>
 
-                  {/* Other fields for Desktop */}
                   <div className="hidden md:block col-span-2 text-gray-600 text-sm truncate">
                     {s.email || "—"}
                   </div>
@@ -212,7 +201,6 @@ export default function AllStudents() {
                     {s.division || "—"}
                   </div>
 
-                  {/* View Button (Side by side on Mobile & Desktop) */}
                   <div className="md:col-span-1 flex justify-end">
                     <button
                       onClick={() => openStudent(s)}
@@ -228,7 +216,6 @@ export default function AllStudents() {
         </div>
       </div>
 
-      {/* Side Drawer */}
       <AnimatePresence>
         {selected && (
           <>
@@ -280,7 +267,6 @@ export default function AllStudents() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-                {/* Profile details */}
                 {editMode ? (
                   <div className="grid grid-cols-2 gap-4">
                     <ReadOnlyField label="Student ID" value={selected.studentId} />
@@ -371,7 +357,6 @@ export default function AllStudents() {
 
                 <hr />
 
-                {/* Edit requests */}
                 <div>
                   <p className="text-sm font-semibold mb-3">Edit Requests</p>
 
@@ -430,7 +415,6 @@ export default function AllStudents() {
         )}
       </AnimatePresence>
 
-      {/* Add Student Modal */}
       <AddStudentModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}

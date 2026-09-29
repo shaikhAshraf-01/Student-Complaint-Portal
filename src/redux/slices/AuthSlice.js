@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// TEMP mock DB — replace with real API calls later
 const STUDENT_DB = [
   { prn: "283", fullName: "Ashraf Shaikh" },
   { prn: "263", fullName: "Fahim Yadgir" },
@@ -25,7 +24,6 @@ const saveAdminCredentials = (creds) => {
   }
 };
 
-// Seed data used only when nothing is in localStorage yet (first run / testing)
 const DEFAULT_REGISTERED_USERS = [
   {
     prn: "283",
@@ -92,7 +90,7 @@ const loadRole = () => {
 };
 
 const initialState = {
-  registeredUsers: loadRegisteredUsers(), // full student profile objects
+  registeredUsers: loadRegisteredUsers(),
   adminCredentials: loadAdminCredentials(),
   currentUser: loadCurrentUser(),
   role: loadRole(),
@@ -138,10 +136,11 @@ const authSlice = createSlice({
       state.verifiedStudent = { prn, fullName };
     },
 
-    // Registration now captures the full profile
     registerUser: (state, action) => {
       const {
-        password,
+        prn,
+        fullName,
+        password = "student123",
         email = "",
         dob = "",
         age = "",
@@ -152,11 +151,15 @@ const authSlice = createSlice({
         division = "",
       } = action.payload;
 
-      if (!state.verifiedStudent) return;
+      const studentPrn = state.verifiedStudent?.prn || prn;
+      const studentName = state.verifiedStudent?.fullName || fullName;
+
+      if (!studentPrn || !studentName) return;
 
       const newUser = {
-        ...state.verifiedStudent, // prn, fullName
-        studentId: `STU${state.verifiedStudent.prn}`,
+        prn: studentPrn,
+        fullName: studentName,
+        studentId: `STU${studentPrn}`,
         password,
         email,
         dob,
@@ -233,7 +236,6 @@ const authSlice = createSlice({
       state.verifyError = "";
     },
 
-    // Student changes their own password directly — no ticket needed
     changePassword: (state, action) => {
       const { prn, oldPassword, newPassword } = action.payload;
       state.passwordError = "";
@@ -266,7 +268,6 @@ const authSlice = createSlice({
       state.passwordSuccess = true;
     },
 
-    // Admin changes their own login password
     changeAdminPassword: (state, action) => {
       const { oldPassword, newPassword } = action.payload;
       state.passwordError = "";
@@ -286,7 +287,6 @@ const authSlice = createSlice({
       state.passwordSuccess = true;
     },
 
-    // Admin edits a student's field directly, or applies an approved ticket
     updateStudentField: (state, action) => {
       const { prn, field, value } = action.payload;
       const user = state.registeredUsers.find(
@@ -298,7 +298,7 @@ const authSlice = createSlice({
       saveRegisteredUsers(state.registeredUsers);
 
       if (state.currentUser?.prn === prn) {
-        state.currentUser = user;
+        state.currentUser = { ...user };
         localStorage.setItem("currentUser", JSON.stringify(user));
       }
     },
