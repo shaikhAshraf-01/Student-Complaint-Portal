@@ -50,10 +50,37 @@ function ComplaintForm() {
     };
   }, []);
 
-  const handleFileChange = (e) => {
-    const newFiles = Array.from(e.target.files);
+  // Helper function to convert File to Base64 (Data URL)
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () =>
+        resolve({
+          name: file.name,
+          type: file.type,
+          url: reader.result, // Base64 String
+        });
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
-    setDocuments((prev) => [...prev, ...newFiles]);
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    try {
+      // Convert all selected files into Base64 objects
+      const convertedFiles = await Promise.all(
+        files.map((file) => convertToBase64(file))
+      );
+
+      setDocuments((prev) => [...prev, ...convertedFiles]);
+    } catch (err) {
+      console.error("Error converting file to Base64:", err);
+      setError("Failed to process selected file(s).");
+    }
+
     setShowUploadMenu(false);
   };
 
@@ -115,7 +142,7 @@ function ComplaintForm() {
       description: description.trim(),
       location: location.trim(),
       category,
-      documents: documents.map((file) => file.name),
+      documents, // Pure object format Array [{ name, type, url }] Redux & localStorage ke liye valid hai
       status: "In Progress",
       date: new Date().toISOString().split("T")[0],
       submittedBy: currentUser?.fullName || "Unknown",
@@ -334,30 +361,41 @@ function ComplaintForm() {
           </div>
         </div>
 
-        {/* Selected Files */}
+        {/* Selected Files Preview & Remove */}
         {documents.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {documents.map((file, index) => (
-              <span
-                key={`${file.name}-${index}`}
-                className="flex items-center gap-1.5 text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full"
+          <div className="flex flex-wrap gap-2 mt-1">
+            {documents.map((fileObj, index) => (
+              <div
+                key={`${fileObj.name}-${index}`}
+                className="flex items-center gap-2 text-xs bg-slate-100 text-slate-700 px-2.5 py-1.5 rounded-md border border-slate-200"
               >
-                {file.name}
+                {/* Image thumbnail preview */}
+                {fileObj.url && fileObj.url.startsWith("data:image") ? (
+                  <img
+                    src={fileObj.url}
+                    alt={fileObj.name}
+                    className="w-6 h-6 object-cover rounded"
+                  />
+                ) : null}
+
+                <span className="max-w-[120px] truncate">
+                  {fileObj.name}
+                </span>
 
                 <button
                   type="button"
                   onClick={() => removeDocument(index)}
-                  className="text-slate-400 hover:text-rose-600"
+                  className="text-slate-400 hover:text-rose-600 ml-1"
                 >
-                  <FaTimes size={10} />
+                  <FaTimes size={12} />
                 </button>
-              </span>
+              </div>
             ))}
           </div>
         )}
 
         {/* Rules Checkbox */}
-        <div className="flex items-center gap-2 cursor-pointer">
+        <div className="flex items-center gap-2 cursor-pointer mt-1">
           <input
             type="checkbox"
             name="readRules"
