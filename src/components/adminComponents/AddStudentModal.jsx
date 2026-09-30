@@ -28,8 +28,10 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
       alert("Please fill PRN and Full Name");
       return;
     }
+    
     onAdd(formData);
     onClose();
+
     // Reset Form
     setFormData({
       prn: "",

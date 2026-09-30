@@ -10,8 +10,10 @@ import {
   FaUserGraduate,
   FaPen,
   FaSave,
-  FaPlus,
+  FaUserPlus,
 } from "react-icons/fa";
+
+// Dono actions AuthSlice se aayenge
 import { updateStudentField, registerUser } from "../../redux/slices/AuthSlice";
 import { approveRequest, rejectRequest } from "../../redux/slices/EditRequestSlice";
 import AddStudentModal from "./AddStudentModal";
@@ -25,8 +27,9 @@ const FIELD_LABELS = {
 
 export default function AllStudents() {
   const dispatch = useDispatch();
-  const students = useSelector((state) => state.auth.registeredUsers);
-  const requests = useSelector((state) => state.editRequests.list);
+
+  const students = useSelector((state) => state.auth?.registeredUsers) || [];
+  const requests = useSelector((state) => state.editRequests?.list) || [];
 
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
@@ -38,15 +41,15 @@ export default function AllStudents() {
     setSelected(s);
     setEditMode(false);
     setEditForm({
-      fullName: s.fullName || "",
-      email: s.email || "",
-      mobile: s.mobile || "",
-      dob: s.dob || "",
-      age: s.age || "",
-      gender: s.gender || "",
-      department: s.department || "",
-      year: s.year || "",
-      division: s.division || "",
+      fullName: s?.fullName || "",
+      email: s?.email || "",
+      mobile: s?.mobile || "",
+      dob: s?.dob || "",
+      age: s?.age || "",
+      gender: s?.gender || "",
+      department: s?.department || "",
+      year: s?.year || "",
+      division: s?.division || "",
     });
   };
 
@@ -59,34 +62,43 @@ export default function AllStudents() {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // View Drawer ka Edit Save (AuthSlice update)
   const handleSaveEdits = () => {
     if (!selected) return;
+
     Object.entries(editForm).forEach(([field, value]) => {
       if (value !== (selected[field] || "")) {
         dispatch(updateStudentField({ prn: selected.prn, field, value }));
       }
     });
-    setSelected({ ...selected, ...editForm });
+
+    setSelected((prev) => ({ ...prev, ...editForm }));
     setEditMode(false);
   };
 
+  // Naya Student Add karna -> AuthSlice mein jaayega
   const handleAddStudent = (newStudentData) => {
-    dispatch(registerUser(newStudentData));
+    dispatch(registerUser(newStudentData)); 
+    // AGAR aapke AuthSlice mein action ka naam registerUser ki jagah addStudent hai, toh wahi dispatch karein.
   };
 
   const filteredStudents = students.filter((s) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return (
-      s.fullName?.toLowerCase().includes(q) ||
-      s.prn?.toLowerCase().includes(q) ||
-      s.email?.toLowerCase().includes(q) ||
-      s.department?.toLowerCase().includes(q)
+      s?.fullName?.toLowerCase().includes(q) ||
+      s?.prn?.toLowerCase().includes(q) ||
+      s?.email?.toLowerCase().includes(q) ||
+      s?.department?.toLowerCase().includes(q)
     );
   });
 
+  const pendingRequests = requests.filter((r) => r?.status === "Pending");
+
   const studentRequests = (prn) =>
-    requests.filter((r) => r.prn === prn).sort((a, b) => (a.date < b.date ? 1 : -1));
+    requests
+      .filter((r) => r?.prn === prn)
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
 
   const handleApprove = (req) => {
     dispatch(
@@ -105,31 +117,38 @@ export default function AllStudents() {
 
   return (
     <div className="p-4 md:p-6 relative">
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">All Students</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500">
             View student records and manage edit requests.
           </p>
         </div>
 
-        {/* Height Fixed Search Box and Add Button */}
-        <div className="flex items-center justify-between gap-2.5">
-          <div className="relative flex-1 max-w-xs">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm" />
+        <div className="flex items-center gap-3">
+          {pendingRequests.length > 0 && (
+            <span className="flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs font-medium px-3 py-1.5 rounded-full">
+              <FaClock className="text-[10px]" />
+              {pendingRequests.length} pending request
+              {pendingRequests.length > 1 ? "s" : ""}
+            </span>
+          )}
+
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="w-full h-10 pl-8 pr-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
+              placeholder="Search by name, PRN, email..."
+              className="pl-9 pr-3 py-2 border rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-violet-400"
             />
           </div>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="h-10 flex items-center justify-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs sm:text-sm px-3.5 rounded-lg shadow-sm transition whitespace-nowrap"
+            className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
           >
-            <FaPlus className="text-xs" />
+            <FaUserPlus />
             <span>Add Student</span>
           </button>
         </div>
@@ -149,26 +168,26 @@ export default function AllStudents() {
 
         <div className="divide-y">
           {filteredStudents.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 text-sm">
+            <div className="p-8 text-center text-gray-500">
               No students found.
             </div>
           ) : (
             filteredStudents.map((s) => {
               const hasPending = requests.some(
-                (r) => r.prn === s.prn && r.status === "Pending"
+                (r) => r?.prn === s?.prn && r?.status === "Pending"
               );
               return (
                 <div
-                  key={s.prn}
-                  className="flex items-center justify-between p-4 md:grid md:grid-cols-12 md:gap-4 md:px-5 md:py-4 hover:bg-gray-50 transition"
+                  key={s?.prn}
+                  className="grid grid-cols-2 md:grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-gray-50 transition"
                 >
                   <div className="hidden md:block col-span-1 text-gray-600 text-sm">
-                    {s.prn}
+                    {s?.prn}
                   </div>
 
-                  <div className="md:col-span-2">
-                    <p className="font-medium text-sm flex items-center gap-1.5">
-                      {s.fullName}
+                  <div className="col-span-2">
+                    <p className="font-medium flex items-center gap-2">
+                      {s?.fullName}
                       {hasPending && (
                         <span
                           className="w-2 h-2 rounded-full bg-amber-500"
@@ -177,34 +196,34 @@ export default function AllStudents() {
                       )}
                     </p>
                     <p className="text-xs text-gray-400 md:hidden">
-                      PRN: {s.prn}
+                      PRN: {s?.prn}
                     </p>
                   </div>
 
                   <div className="hidden md:block col-span-2 text-gray-600 text-sm truncate">
-                    {s.email || "—"}
+                    {s?.email || "—"}
                   </div>
 
                   <div className="hidden md:block col-span-2 text-gray-600 text-sm">
-                    {s.mobile || "—"}
+                    {s?.mobile || "—"}
                   </div>
 
                   <div className="hidden md:block col-span-2 text-gray-600 text-sm uppercase">
-                    {s.department || "—"}
+                    {s?.department || "—"}
                   </div>
 
                   <div className="hidden md:block col-span-1 text-gray-600 text-sm">
-                    {s.year || "—"}
+                    {s?.year || "—"}
                   </div>
 
                   <div className="hidden md:block col-span-1 text-gray-600 text-sm">
-                    {s.division || "—"}
+                    {s?.division || "—"}
                   </div>
 
-                  <div className="md:col-span-1 flex justify-end">
+                  <div className="col-span-1 flex justify-end">
                     <button
                       onClick={() => openStudent(s)}
-                      className="text-violet-600 font-medium text-sm hover:underline py-1 px-2"
+                      className="text-violet-600 font-medium text-sm hover:underline"
                     >
                       View
                     </button>
@@ -216,6 +235,14 @@ export default function AllStudents() {
         </div>
       </div>
 
+      {/* Add Student Modal */}
+      <AddStudentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddStudent}
+      />
+
+      {/* Side Drawer */}
       <AnimatePresence>
         {selected && (
           <>
@@ -414,12 +441,6 @@ export default function AllStudents() {
           </>
         )}
       </AnimatePresence>
-
-      <AddStudentModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddStudent}
-      />
     </div>
   );
 }

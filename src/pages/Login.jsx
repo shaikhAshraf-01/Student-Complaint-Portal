@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   verifyStudent,
-  registerUser,
+  completeStudentRegistration,
   loginUser,
   clearAuthErrors,
   resetVerification,
@@ -21,28 +21,26 @@ const Login = () => {
   const [role, setRole] = useState("student");
   const [authMode, setAuthMode] = useState("login"); // "login" | "register"
 
-  // ---------- Login flow state (UI only) ----------
+  // Login flow state
   const [loginId, setLoginId] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  // ---------- Register flow state (UI only) ----------
+  // Register flow state
   const [prn, setPrn] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [localError, setLocalError] = useState(""); // for password length/match checks
+  const [localError, setLocalError] = useState("");
 
   const isVerified = !!verifiedStudent;
 
-  // ---------- Redirect once login actually succeeds ----------
   useEffect(() => {
     if (currentUser && authRole) {
       navigate(authRole === "admin" ? "/admin" : "/student");
     }
   }, [currentUser, authRole, navigate]);
 
-  // ---------- Handlers ----------
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(clearAuthErrors());
@@ -58,23 +56,21 @@ const Login = () => {
     e.preventDefault();
     setLocalError("");
 
-    // Regular expression to check for:
-// (?=.*[A-Z]) -> At least one uppercase letter
-// (?=.*\d)    -> At least one number
-// (?=.*[!@#$%^&*(),.?":{}|<>]) -> At least one special character
-const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$\%^&*(),.?":{}\vert{}<>]).{6,}$/;
 
-if (!passwordRegex.test(password)) {
-  setLocalError("Password must be at least 6 characters and include one uppercase letter, one number, and one special character.");
-  return;
-}
+    if (!passwordRegex.test(password)) {
+      setLocalError(
+        "Password must be at least 6 characters and include one uppercase letter, one number, and one special character."
+      );
+      return;
+    }
 
     if (password !== confirmPassword) {
       setLocalError("Passwords do not match.");
       return;
     }
 
-    dispatch(registerUser({ password }));
+    dispatch(completeStudentRegistration({ password }));
     setRegisterSuccess(true);
 
     setTimeout(() => {
@@ -128,8 +124,7 @@ if (!passwordRegex.test(password)) {
             <>
               <h1 className="text-4xl font-bold">Student Complaint Portal</h1>
               <p className="mt-4 text-lg">
-                Raise complaints, track status, and communicate with the
-                administration.
+                Raise complaints, track status, and communicate with the administration.
               </p>
               <img
                 src={student}
@@ -200,7 +195,7 @@ if (!passwordRegex.test(password)) {
             </button>
           </div>
 
-          {/* Login / Register tabs — students only */}
+          {/* Login / Register tabs */}
           {role === "student" && (
             <div className="mb-6 flex justify-center gap-6 border-b border-gray-200">
               <button
@@ -229,7 +224,7 @@ if (!passwordRegex.test(password)) {
           )}
 
           <AnimatePresence mode="wait">
-            {/* ---------- LOGIN FORM (admin, or student in login mode) ---------- */}
+            {/* LOGIN FORM */}
             {(role === "admin" || authMode === "login") && (
               <motion.form
                 key="login-form"
@@ -242,7 +237,7 @@ if (!passwordRegex.test(password)) {
               >
                 <div>
                   <label className="mb-1 block text-sm font-medium">
-                    {role === "student" ? "Roll Number" : "Username"}
+                    {role === "student" ? "Roll Number / PRN" : "Username"}
                   </label>
                   <input
                     type="text"
@@ -250,7 +245,7 @@ if (!passwordRegex.test(password)) {
                     maxLength={10}
                     onChange={(e) => setLoginId(e.target.value)}
                     placeholder={
-                      role === "student" ? "Enter Roll Number" : "Enter Username"
+                      role === "student" ? "Enter Roll Number / PRN" : "Enter Username"
                     }
                     className="w-full rounded-lg border px-4 py-3 outline-none transition-all duration-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
                   />
@@ -263,7 +258,7 @@ if (!passwordRegex.test(password)) {
                   <input
                     type="password"
                     minLength={6}
-                    maxLength={12}
+                    maxLength={14}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Enter Password"
@@ -286,7 +281,7 @@ if (!passwordRegex.test(password)) {
               </motion.form>
             )}
 
-            {/* ---------- REGISTER FORM (student only) ---------- */}
+            {/* REGISTER FORM */}
             {role === "student" && authMode === "register" && (
               <motion.form
                 key="register-form"
@@ -327,7 +322,6 @@ if (!passwordRegex.test(password)) {
                   />
                 </div>
 
-                {/* Password fields appear only after a successful match */}
                 <AnimatePresence>
                   {isVerified && !registerSuccess && (
                     <motion.div

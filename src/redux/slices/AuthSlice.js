@@ -1,10 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const STUDENT_DB = [
-  { prn: "283", fullName: "Ashraf Shaikh" },
-  { prn: "263", fullName: "Fahim Yadgir" },
-];
-
 const loadAdminCredentials = () => {
   try {
     const saved = localStorage.getItem("adminCredentials");
@@ -24,34 +19,37 @@ const saveAdminCredentials = (creds) => {
   }
 };
 
+// Seed initial data if localStorage is empty
 const DEFAULT_REGISTERED_USERS = [
   {
     prn: "283",
     fullName: "Ashraf Shaikh",
     studentId: "STU283",
     password: "student123",
-    email: null,
-    dob: "",
+    email: "ashraf@example.com",
+    dob: "2000-01-01",
     age: "24",
-    gender: "",
-    mobile: "12345",
+    gender: "Male",
+    mobile: "1234567890",
     department: "BCA",
     year: "TY",
     division: "D",
+    isRegistered: true,
   },
   {
     prn: "263",
     fullName: "Fahim Yadgir",
     studentId: "STU263",
     password: "student123",
-    email: null,
-    dob: "",
+    email: "fahim@example.com",
+    dob: "2000-01-01",
     age: "24",
-    gender: "",
-    mobile: "98765",
+    gender: "Male",
+    mobile: "9876543210",
     department: "BCA",
     year: "TY",
     division: "D",
+    isRegistered: true,
   },
 ];
 
@@ -90,7 +88,7 @@ const loadRole = () => {
 };
 
 const initialState = {
-  registeredUsers: loadRegisteredUsers(),
+  registeredUsers: loadRegisteredUsers(), // Contains all students added by admin / registered
   adminCredentials: loadAdminCredentials(),
   currentUser: loadCurrentUser(),
   role: loadRole(),
@@ -105,11 +103,40 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // 1. Admin Adds / Creates a Student
+    registerUser: (state, action) => {
+      const studentData = action.payload;
+
+      const existingIndex = state.registeredUsers.findIndex(
+        (u) => u.prn.trim().toLowerCase() === studentData.prn.trim().toLowerCase()
+      );
+
+      if (existingIndex !== -1) {
+        // Update existing record
+        state.registeredUsers[existingIndex] = {
+          ...state.registeredUsers[existingIndex],
+          ...studentData,
+        };
+      } else {
+        // Add new student record
+        const newUser = {
+          ...studentData,
+          studentId: `STU${studentData.prn}`,
+          isRegistered: false, // Student has not set password yet
+          password: "",
+        };
+        state.registeredUsers.push(newUser);
+      }
+
+      saveRegisteredUsers(state.registeredUsers);
+    },
+
+    // 2. Student Verifies PRN & Full Name on Register Tab
     verifyStudent: (state, action) => {
       const { prn, fullName } = action.payload;
       state.verifyError = "";
 
-      const match = STUDENT_DB.find(
+      const match = state.registeredUsers.find(
         (s) =>
           s.prn.trim().toLowerCase() === prn.trim().toLowerCase() &&
           s.fullName.trim().toLowerCase() === fullName.trim().toLowerCase()
@@ -118,65 +145,42 @@ const authSlice = createSlice({
       if (!match) {
         state.verifiedStudent = null;
         state.verifyError =
-          "No matching student record found. Check your PRN and full name.";
+          "No matching student record found. Enter the PRN and Full Name added by Admin.";
         return;
       }
 
-      const alreadyRegistered = state.registeredUsers.some(
-        (u) => u.prn.trim().toLowerCase() === prn.trim().toLowerCase()
-      );
-
-      if (alreadyRegistered) {
+      if (match.isRegistered && match.password) {
         state.verifiedStudent = null;
         state.verifyError =
           "This student is already registered. Please log in instead.";
         return;
       }
 
-      state.verifiedStudent = { prn, fullName };
+      state.verifiedStudent = match;
     },
 
-    registerUser: (state, action) => {
-      const {
-        prn,
-        fullName,
-        password = "student123",
-        email = "",
-        dob = "",
-        age = "",
-        gender = "",
-        mobile = "",
-        department = "",
-        year = "",
-        division = "",
-      } = action.payload;
+    // 3. Student Creates Password and Completes Registration
+    completeStudentRegistration: (state, action) => {
+      const { password } = action.payload;
+      if (!state.verifiedStudent) return;
 
-      const studentPrn = state.verifiedStudent?.prn || prn;
-      const studentName = state.verifiedStudent?.fullName || fullName;
+      const user = state.registeredUsers.find(
+        (u) =>
+          u.prn.trim().toLowerCase() ===
+          state.verifiedStudent.prn.trim().toLowerCase()
+      );
 
-      if (!studentPrn || !studentName) return;
+      if (user) {
+        user.password = password;
+        user.isRegistered = true;
+        saveRegisteredUsers(state.registeredUsers);
+      }
 
-      const newUser = {
-        prn: studentPrn,
-        fullName: studentName,
-        studentId: `STU${studentPrn}`,
-        password,
-        email,
-        dob,
-        age,
-        gender,
-        mobile,
-        department,
-        year,
-        division,
-      };
-
-      state.registeredUsers.push(newUser);
-      saveRegisteredUsers(state.registeredUsers);
       state.verifiedStudent = null;
       state.verifyError = "";
     },
 
+    // 4. Login Function
     loginUser: (state, action) => {
       const { id, password, role } = action.payload;
       state.loginError = "";
@@ -197,15 +201,23 @@ const authSlice = createSlice({
         return;
       }
 
+      // Student Login
       const user = state.registeredUsers.find(
         (u) => u.prn.trim().toLowerCase() === id.trim().toLowerCase()
       );
 
       if (!user) {
         state.loginError =
-          "No account found for this Roll Number. Please register first.";
+          "No record found for this PRN / Roll Number. Please register first.";
         return;
       }
+
+      if (!user.isRegistered || !user.password) {
+        state.loginError =
+          "Account not active yet. Please go to Register tab to create your password.";
+        return;
+      }
+
       if (user.password !== password) {
         state.loginError = "Incorrect password.";
         return;
@@ -298,7 +310,7 @@ const authSlice = createSlice({
       saveRegisteredUsers(state.registeredUsers);
 
       if (state.currentUser?.prn === prn) {
-        state.currentUser = { ...user };
+        state.currentUser = user;
         localStorage.setItem("currentUser", JSON.stringify(user));
       }
     },
@@ -308,6 +320,7 @@ const authSlice = createSlice({
 export const {
   verifyStudent,
   registerUser,
+  completeStudentRegistration,
   loginUser,
   logout,
   clearAuthErrors,
