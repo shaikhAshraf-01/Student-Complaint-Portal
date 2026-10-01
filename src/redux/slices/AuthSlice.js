@@ -56,7 +56,12 @@ const DEFAULT_REGISTERED_USERS = [
 const loadRegisteredUsers = () => {
   try {
     const saved = localStorage.getItem("registeredUsers");
-    return saved ? JSON.parse(saved) : DEFAULT_REGISTERED_USERS;
+    if (!saved) return DEFAULT_REGISTERED_USERS;
+    // Purane records me isRegistered flag nahi tha -> password se nikal lo
+    return JSON.parse(saved).map((u) => ({
+      ...u,
+      isRegistered: u.isRegistered ?? !!u.password,
+    }));
   } catch {
     return DEFAULT_REGISTERED_USERS;
   }
@@ -105,27 +110,34 @@ const authSlice = createSlice({
   reducers: {
     // 1. Admin Adds / Creates a Student
     registerUser: (state, action) => {
-      const studentData = action.payload;
+      const raw = action.payload;
+      const studentData = {
+        ...raw,
+        prn: raw.prn.trim(),
+        fullName: raw.fullName.trim(),
+      };
 
       const existingIndex = state.registeredUsers.findIndex(
-        (u) => u.prn.trim().toLowerCase() === studentData.prn.trim().toLowerCase()
+        (u) => u.prn.trim().toLowerCase() === studentData.prn.toLowerCase()
       );
 
       if (existingIndex !== -1) {
-        // Update existing record
+        // Sirf non-empty fields update karo, blank se purana data na mite
+        const nonEmpty = Object.fromEntries(
+          Object.entries(studentData).filter(([, v]) => v !== "" && v != null)
+        );
         state.registeredUsers[existingIndex] = {
           ...state.registeredUsers[existingIndex],
-          ...studentData,
+          ...nonEmpty,
         };
       } else {
         // Add new student record
-        const newUser = {
+        state.registeredUsers.push({
           ...studentData,
           studentId: `STU${studentData.prn}`,
           isRegistered: false, // Student has not set password yet
           password: "",
-        };
-        state.registeredUsers.push(newUser);
+        });
       }
 
       saveRegisteredUsers(state.registeredUsers);
@@ -149,14 +161,16 @@ const authSlice = createSlice({
         return;
       }
 
-      if (match.isRegistered && match.password) {
+      // Password already set -> account active, re-register allowed nahi
+      if (match.password) {
         state.verifiedStudent = null;
         state.verifyError =
           "This student is already registered. Please log in instead.";
         return;
       }
 
-      state.verifiedStudent = match;
+      // Poora record (password samet) state me na rakho, sirf PRN + naam
+      state.verifiedStudent = { prn: match.prn, fullName: match.fullName };
     },
 
     // 3. Student Creates Password and Completes Registration

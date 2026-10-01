@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaPaperPlane, FaImage } from "react-icons/fa";
+import { FaTimes, FaPaperPlane, FaFilePdf, FaFileAlt } from "react-icons/fa";
 
 const STATUS_OPTIONS = ["In Progress", "Resolved", "Rejected"];
 
@@ -80,7 +80,7 @@ export default function ComplaintDetailDrawer({
               {/* Uploaded Documents / Images */}
               <div>
                 <p className="text-xs text-gray-400 uppercase font-medium mb-2">
-                  Attached Images / Media
+                  Attached Images / Documents
                 </p>
                 {selected.documents && selected.documents.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -102,12 +102,30 @@ export default function ComplaintDetailDrawer({
                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition" />
                         </button>
+                      ) : isObject && doc.url ? (
+                        // PDF / other file: click karke download ya open
+                        <a
+                          key={idx}
+                          href={doc.url}
+                          download={doc.name || `document-${idx + 1}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Click to open / download"
+                          className="flex items-center gap-2 text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:border-violet-500 hover:bg-violet-50 transition"
+                        >
+                          {doc.type === "application/pdf" ? (
+                            <FaFilePdf className="text-red-500" />
+                          ) : (
+                            <FaFileAlt className="text-slate-400" />
+                          )}
+                          <span className="truncate max-w-[150px]">{doc.name}</span>
+                        </a>
                       ) : (
                         <div
                           key={idx}
                           className="flex items-center gap-2 text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border border-slate-200"
                         >
-                          <FaImage className="text-slate-400" />
+                          <FaFileAlt className="text-slate-400" />
                           <span className="truncate max-w-[150px]">
                             {isObject ? doc.name : doc}
                           </span>

@@ -36,7 +36,7 @@ function StudentDashboard() {
   ).length;
 
   return (
-    <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-hidden px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
+    <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-visible px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
 
       {/* Header */}
       <header className="mb-1">

@@ -56,7 +56,8 @@ const Login = () => {
     e.preventDefault();
     setLocalError("");
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$\%^&*(),.?":{}\vert{}<>]).{6,}$/;
+    // Kam se kam 1 uppercase, 1 number, 1 special character, length >= 6
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
 
     if (!passwordRegex.test(password)) {
       setLocalError(
@@ -242,7 +243,7 @@ const Login = () => {
                   <input
                     type="text"
                     value={loginId}
-                    maxLength={10}
+                    maxLength={12}
                     onChange={(e) => setLoginId(e.target.value)}
                     placeholder={
                       role === "student" ? "Enter Roll Number / PRN" : "Enter Username"

@@ -25,8 +25,8 @@ export default function AdminChart() {
         Complaints Overview
       </h3>
 
-      <div className="relative flex-1 min-h-[180px]">
-        <ResponsiveContainer width="100%" height="100%">
+<div className="relative w-full h-64 md:h-auto md:flex-1 md:min-h-[180px]">      
+    <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}

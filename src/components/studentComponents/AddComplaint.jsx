@@ -2,7 +2,7 @@ import ComplaintForm from "./addComplaintComponents/ComplaintForm";
 import Rules from "./addComplaintComponents/Rules";
 function AddComplaint(){
     return(
-    <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-hidden px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
+    <div className="w-full min-h-screen md:h-screen overflow-visible md:overflow-visible px-4 py-6 md:px-10 md:py-6 bg-slate-50 flex flex-col">
             <header className="border-b border-slate-400 pb-2 ">
                 <h1 className="text-2xl text-purple-700 font-bold">Add New Complaint</h1>
                 <p>Submit a new complaint to your administrator</p>

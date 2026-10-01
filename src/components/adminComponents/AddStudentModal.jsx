@@ -2,10 +2,11 @@ import { useState } from "react";
 import { FaTimes, FaUserPlus } from "react-icons/fa";
 
 export default function AddStudentModal({ isOpen, onClose, onAdd }) {
-  const [formData, setFormData] = useState({
+  const INITIAL_STATE = {
     prn: "",
     fullName: "",
     email: "",
+    countryCode: "+91",
     mobile: "",
     dob: "",
     age: "",
@@ -13,12 +14,35 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
     department: "",
     year: "",
     division: "",
-  });
+  };
+
+  const [formData, setFormData] = useState(INITIAL_STATE);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // 1. Full Name Validation: Sirf alphabets aur spaces allowed hain
+    if (name === "fullName") {
+      if (!/^[a-zA-Z\s]*$/.test(value)) return;
+    }
+
+    // 2. PRN Validation: Sirf numbers allowed hain
+    if (name === "prn") {
+      if (!/^\d*$/.test(value)) return;
+    }
+
+    // 3. Mobile Number Validation: Sirf numbers aur max 10 digits
+    if (name === "mobile") {
+      if (!/^\d*$/.test(value) || value.length > 10) return;
+    }
+
+    // 4. Age Validation: Sirf numbers aur max 2 digits
+    if (name === "age") {
+      if (!/^\d*$/.test(value) || value.length > 2) return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -28,29 +52,26 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
       alert("Please fill PRN and Full Name");
       return;
     }
-    
-    onAdd(formData);
-    onClose();
 
-    // Reset Form
-    setFormData({
-      prn: "",
-      fullName: "",
-      email: "",
-      mobile: "",
-      dob: "",
-      age: "",
-      gender: "",
-      department: "",
-      year: "",
-      division: "",
-    });
+    // Full Mobile Number with Country Code
+    const fullData = {
+      ...formData,
+      fullMobile: `${formData.countryCode} ${formData.mobile}`,
+    };
+
+    onAdd(fullData);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setFormData(INITIAL_STATE);
+    onClose();
   };
 
   return (
     <div
       className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl relative overflow-hidden"
@@ -63,7 +84,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
             <h2 className="text-xl font-bold text-gray-800">Add New Student</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-700 transition"
           >
             <FaTimes size={18} />
@@ -80,6 +101,8 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                 name="prn"
                 required
                 value={formData.prn}
+                 minLength={6}
+                 maxLength={14}
                 onChange={handleChange}
                 placeholder="e.g. 284"
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
@@ -93,6 +116,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                 name="fullName"
                 required
                 value={formData.fullName}
+                          maxLength={32}
                 onChange={handleChange}
                 placeholder="Student Name"
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
@@ -105,22 +129,40 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                 type="email"
                 name="email"
                 value={formData.email}
+                          maxLength={32}
                 onChange={handleChange}
                 placeholder="student@example.com"
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
               />
             </div>
 
+            {/* Mobile with Country Code Selector */}
             <div>
               <label className="text-xs text-gray-500 uppercase font-medium">Mobile</label>
-              <input
-                type="text"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                placeholder="Mobile Number"
-                className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
-              />
+              <div className="flex gap-1 mt-1">
+                <select
+                  name="countryCode"
+                  value={formData.countryCode}
+                  onChange={handleChange}
+                  className="border rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white"
+                >
+                  <option value="+91">+91 (IN)</option>
+                  <option value="+1">+1 (US)</option>
+                  <option value="+44">+44 (UK)</option>
+                  <option value="+61">+61 (AU)</option>
+                  <option value="+971">+971 (UAE)</option>
+                </select>
+                <input
+                  type="text"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="10 digit number"
+                   minLength={10}
+                  maxLength={10}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
+                />
+              </div>
             </div>
 
             <div>
@@ -137,11 +179,12 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
             <div>
               <label className="text-xs text-gray-500 uppercase font-medium">Age</label>
               <input
-                type="number"
+                type="text"
                 name="age"
                 value={formData.age}
                 onChange={handleChange}
                 placeholder="e.g. 21"
+                maxLength={2}
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
               />
             </div>
@@ -185,6 +228,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                 value={formData.year}
                 onChange={handleChange}
                 placeholder="FY / SY / TY"
+                maxLength={4}
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
               />
             </div>
@@ -197,6 +241,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                 value={formData.division}
                 onChange={handleChange}
                 placeholder="A / B / C / D"
+                maxLength={2}
                 className="w-full mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
               />
             </div>
@@ -205,7 +250,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
           <div className="pt-4 flex items-center justify-end gap-3 border-t">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
             >
               Cancel
