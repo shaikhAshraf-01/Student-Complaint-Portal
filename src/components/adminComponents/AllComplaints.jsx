@@ -5,10 +5,17 @@ import {
   FaClock,
   FaTimesCircle,
   FaEye,
+  FaTrashAlt,
 } from "react-icons/fa";
-import { addResponse } from "../../redux/slices/ComplaintSlice";
+import {
+  addResponse,
+  permanentDeleteComplaint,
+} from "../../redux/slices/ComplaintSlice";
 import ComplaintDetailDrawer from "./ComplaintDetailDrawer";
 import ImageLightboxModal from "./ImageLightboxModal";
+import ConfirmModal from "../ConfirmModal";
+
+const DELETED_FILTER = "Deleted by Student";
 
 const getStatus = (status) => {
   switch (status) {
@@ -30,6 +37,7 @@ export default function AllComplaints() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("In Progress");
   const [filter, setFilter] = useState("All");
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openDrawer = (complaint) => {
     setSelected(complaint);
@@ -54,10 +62,21 @@ export default function AllComplaints() {
     closeDrawer();
   };
 
-  const filteredComplaints =
-    filter === "All"
-      ? complaints
-      : complaints.filter((c) => c.status === filter);
+  // Admin permanently deletes (sirf wo complaints jo student ne delete ki hain)
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    dispatch(permanentDeleteComplaint(deleteTarget.id));
+    if (selected?.id === deleteTarget.id) closeDrawer();
+    setDeleteTarget(null);
+  };
+
+  const deletedCount = complaints.filter((c) => c.deletedByStudent).length;
+
+  const filteredComplaints = complaints.filter((c) => {
+    if (filter === "All") return true;
+    if (filter === DELETED_FILTER) return !!c.deletedByStudent;
+    return c.status === filter;
+  });
 
   return (
     <div className="p-4 md:p-6 relative">
@@ -71,7 +90,7 @@ export default function AllComplaints() {
         </div>
 
         <div className="flex gap-2">
-          {["All", "In Progress", "Resolved", "Rejected"].map((f) => (
+          {["All", "In Progress", "Resolved", "Rejected", DELETED_FILTER].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -82,6 +101,7 @@ export default function AllComplaints() {
               }`}
             >
               {f}
+              {f === DELETED_FILTER && deletedCount > 0 ? ` (${deletedCount})` : ""}
             </button>
           ))}
         </div>
@@ -109,7 +129,9 @@ export default function AllComplaints() {
               return (
                 <div
                   key={c.id}
-                  className="grid grid-cols-2 md:grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-gray-50 transition"
+                  className={`grid grid-cols-2 md:grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-gray-50 transition ${
+                    c.deletedByStudent ? "bg-gray-50/70" : ""
+                  }`}
                 >
                   <div className="hidden md:block col-span-1 text-gray-400 text-sm">
                     #C-{c.id}
@@ -118,6 +140,13 @@ export default function AllComplaints() {
                   <div className="col-span-2 md:col-span-3">
                     <p className="font-medium">{c.title}</p>
                     <p className="text-xs text-gray-400 md:hidden">#C-{c.id}</p>
+                    {c.deletedByStudent && (
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-gray-300 bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                        <FaTrashAlt className="text-[9px]" />
+                        Deleted by student
+                        {c.deletedAt ? ` · ${c.deletedAt}` : ""}
+                      </span>
+                    )}
                   </div>
 
                   <div className="hidden md:block col-span-2 text-gray-600 text-sm">
@@ -137,7 +166,7 @@ export default function AllComplaints() {
                     </span>
                   </div>
 
-                  <div className="col-span-1 md:col-span-2 flex justify-end">
+                  <div className="col-span-1 md:col-span-2 flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
                     <button
                       onClick={() => openDrawer(c)}
                       className="flex items-center gap-1.5 text-violet-600 font-medium text-sm hover:underline"
@@ -145,6 +174,17 @@ export default function AllComplaints() {
                       <FaEye className="text-xs" />
                       {c.adminResponse ? "View & Edit" : "View & Respond"}
                     </button>
+
+                    {c.deletedByStudent && (
+                      <button
+                        onClick={() => setDeleteTarget(c)}
+                        title="Delete permanently"
+                        className="flex items-center gap-1.5 text-red-600 font-medium text-sm hover:underline"
+                      >
+                        <FaTrashAlt className="text-xs" />
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -169,6 +209,20 @@ export default function AllComplaints() {
       <ImageLightboxModal
         image={selectedImage}
         onClose={() => setSelectedImage(null)}
+      />
+
+      {/* Permanent delete confirmation */}
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete permanently?"
+        message={
+          deleteTarget
+            ? `Complaint #C-${deleteTarget.id} ("${deleteTarget.title}") was already deleted by the student. Deleting it now removes it for good, including its attachments. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete permanently"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

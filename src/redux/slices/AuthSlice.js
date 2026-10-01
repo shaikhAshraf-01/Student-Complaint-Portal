@@ -313,6 +313,16 @@ const authSlice = createSlice({
       state.passwordSuccess = true;
     },
 
+    // Admin deletes a student. Complaints / edit requests ko unki apni slices
+    // (extraReducers) hata deti hain.
+    deleteStudent: (state, action) => {
+      const prn = String(action.payload).trim().toLowerCase();
+      state.registeredUsers = state.registeredUsers.filter(
+        (u) => u.prn.trim().toLowerCase() !== prn
+      );
+      saveRegisteredUsers(state.registeredUsers);
+    },
+
     updateStudentField: (state, action) => {
       const { prn, field, value } = action.payload;
       const user = state.registeredUsers.find(
@@ -342,6 +352,7 @@ export const {
   changePassword,
   changeAdminPassword,
   updateStudentField,
+  deleteStudent,
 } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -51,6 +51,7 @@ export default function Responses() {
   const responses = allComplaints.filter(
     (c) =>
       c.stdPRN === currentUser?.prn &&
+      !c.deletedByStudent &&
       c.adminResponse &&
       c.adminResponse.trim() !== ""
   );

@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Complaint from "./Complaint";
+import ConfirmModal from "../../ConfirmModal";
+import { softDeleteComplaint } from "../../../redux/slices/ComplaintSlice";
 
 const FILTERS = [
   { key: "All", label: "All" },
@@ -9,7 +12,18 @@ const FILTERS = [
 ];
 
 function Complaints({ data }) {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth?.currentUser);
+
   const [activeFilter, setActiveFilter] = useState("All");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  // Soft delete: student ke dashboard se hat jaati hai, admin ko "deleted by student" dikhta hai
+  const handleConfirmDelete = () => {
+    if (!deleteTarget || !currentUser?.prn) return;
+    dispatch(softDeleteComplaint({ id: deleteTarget.id, prn: currentUser.prn }));
+    setDeleteTarget(null);
+  };
 
   const filteredData = useMemo(() => {
     if (activeFilter === "All") return data;
@@ -70,10 +84,23 @@ function Complaints({ data }) {
           </div>
         ) : (
           filteredData.map((item) => (
-            <Complaint key={item.id} complaint={item} />
+            <Complaint key={item.id} complaint={item} onDelete={setDeleteTarget} />
           ))
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete this complaint?"
+        message={
+          deleteTarget
+            ? `"${deleteTarget.title}" will be removed from your dashboard. The admin will still be able to see that you deleted it.`
+            : ""
+        }
+        confirmLabel="Delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

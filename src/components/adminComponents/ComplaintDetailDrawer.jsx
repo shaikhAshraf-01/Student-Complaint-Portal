@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaPaperPlane, FaFilePdf, FaFileAlt } from "react-icons/fa";
+import { FaTimes, FaPaperPlane, FaFilePdf, FaFileAlt, FaTrashAlt } from "react-icons/fa";
 
 const STATUS_OPTIONS = ["In Progress", "Resolved", "Rejected"];
 
@@ -47,6 +47,18 @@ export default function ComplaintDetailDrawer({
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+              {selected.deletedByStudent && (
+                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  <FaTrashAlt className="mt-0.5 shrink-0" />
+                  <p>
+                    The student deleted this complaint
+                    {selected.deletedAt ? ` on ${selected.deletedAt}` : ""}. It is
+                    hidden from their dashboard, so they will not see any response
+                    sent now.
+                  </p>
+                </div>
+              )}
+
               <div>
                 <p className="text-xs text-gray-400 uppercase font-medium">Title</p>
                 <p className="font-medium text-gray-800">{selected.title}</p>

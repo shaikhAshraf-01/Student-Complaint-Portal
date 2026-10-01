@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { deleteStudent } from "./AuthSlice";
 
 const initialComplaints = [
   {
@@ -255,9 +256,45 @@ const complaintsSlice = createSlice({
       complaint.isNewResponse = false;
       saveComplaints(state.list);
     },
+
+    // Student "deletes" own complaint -> SOFT delete.
+    // Student ko dikhna band, admin ko "Deleted by student" ke saath dikhta rahega.
+    softDeleteComplaint: (state, action) => {
+      const { id, prn } = action.payload;
+      const complaint = state.list.find(
+        (c) => c.id === id && c.stdPRN === prn
+      );
+      if (!complaint || complaint.deletedByStudent) return;
+      complaint.deletedByStudent = true;
+      complaint.deletedAt = new Date().toISOString().split("T")[0];
+      saveComplaints(state.list);
+    },
+
+    // Admin permanently removes a complaint -> sirf wahi jo student ne already delete ki ho.
+    permanentDeleteComplaint: (state, action) => {
+      const complaint = state.list.find((c) => c.id === action.payload);
+      if (!complaint || !complaint.deletedByStudent) return;
+      state.list = state.list.filter((c) => c.id !== action.payload);
+      saveComplaints(state.list);
+    },
+  },
+  extraReducers: (builder) => {
+    // Admin ne student delete kiya -> uski saari complaints bhi hat jaati hain
+    builder.addCase(deleteStudent, (state, action) => {
+      const prn = String(action.payload).trim().toLowerCase();
+      state.list = state.list.filter(
+        (c) => String(c.stdPRN).trim().toLowerCase() !== prn
+      );
+      saveComplaints(state.list);
+    });
   },
 });
 
-export const { addComplaint, addResponse, markResponseSeen } =
-  complaintsSlice.actions;
+export const {
+  addComplaint,
+  addResponse,
+  markResponseSeen,
+  softDeleteComplaint,
+  permanentDeleteComplaint,
+} = complaintsSlice.actions;
 export default complaintsSlice.reducer;

@@ -5,7 +5,17 @@ import { useSelector } from "react-redux";
 const COLORS = ['#0088FE', '#00C49F', 'red'];
 
 export default function Chart() {
-  const complaints = useSelector((state) => state.complaints.list);
+  const allComplaints = useSelector((state) => state.complaints.list);
+  const currentUser = useSelector((state) => state.auth?.currentUser);
+
+  // Sirf is student ki, delete na ki hui complaints
+  const complaints = useMemo(
+    () =>
+      allComplaints.filter(
+        (c) => c.stdPRN === currentUser?.prn && !c.deletedByStudent
+      ),
+    [allComplaints, currentUser]
+  );
 
   const { inProgress, resolved, rejected } = useMemo(() => {
     const inProgress = complaints.filter(c => c.status === "In Progress").length;

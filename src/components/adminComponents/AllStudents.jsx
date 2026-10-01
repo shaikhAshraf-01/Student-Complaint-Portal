@@ -11,12 +11,18 @@ import {
   FaPen,
   FaSave,
   FaUserPlus,
+  FaTrashAlt,
 } from "react-icons/fa";
 
-// Dono actions AuthSlice se aayenge
-import { updateStudentField, registerUser } from "../../redux/slices/AuthSlice";
+// Student actions AuthSlice se aayenge
+import {
+  updateStudentField,
+  registerUser,
+  deleteStudent,
+} from "../../redux/slices/AuthSlice";
 import { approveRequest, rejectRequest } from "../../redux/slices/EditRequestSlice";
 import AddStudentModal from "./AddStudentModal";
+import ConfirmModal from "../ConfirmModal";
 
 const FIELD_LABELS = {
   fullName: "Full Name",
@@ -30,12 +36,14 @@ export default function AllStudents() {
 
   const students = useSelector((state) => state.auth?.registeredUsers) || [];
   const requests = useSelector((state) => state.editRequests?.list) || [];
+  const complaints = useSelector((state) => state.complaints?.list) || [];
 
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openStudent = (s) => {
     setSelected(s);
@@ -78,9 +86,20 @@ export default function AllStudents() {
 
   // Naya Student Add karna -> AuthSlice mein jaayega
   const handleAddStudent = (newStudentData) => {
-    dispatch(registerUser(newStudentData)); 
-    // AGAR aapke AuthSlice mein action ka naam registerUser ki jagah addStudent hai, toh wahi dispatch karein.
+    dispatch(registerUser(newStudentData));
   };
+
+  // Student delete: account + uski complaints + edit requests hat jaate hain
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    dispatch(deleteStudent(deleteTarget.prn));
+    if (selected?.prn === deleteTarget.prn) closeDrawer();
+    setDeleteTarget(null);
+  };
+
+  const deleteTargetComplaints = deleteTarget
+    ? complaints.filter((c) => c.stdPRN === deleteTarget.prn).length
+    : 0;
 
   const filteredStudents = students.filter((s) => {
     const q = search.trim().toLowerCase();
@@ -160,10 +179,10 @@ export default function AllStudents() {
           <div className="col-span-2">Name</div>
           <div className="col-span-2">Email</div>
           <div className="col-span-2">Mobile</div>
-          <div className="col-span-2">Department</div>
+          <div className="col-span-1">Department</div>
           <div className="col-span-1">Year</div>
           <div className="col-span-1">Division</div>
-          <div className="col-span-1 text-right">Details</div>
+          <div className="col-span-2 text-right">Actions</div>
         </div>
 
         <div className="divide-y">
@@ -208,7 +227,7 @@ export default function AllStudents() {
                     {s?.mobile || "—"}
                   </div>
 
-                  <div className="hidden md:block col-span-2 text-gray-600 text-sm uppercase">
+                  <div className="hidden md:block col-span-1 text-gray-600 text-sm uppercase">
                     {s?.department || "—"}
                   </div>
 
@@ -220,12 +239,20 @@ export default function AllStudents() {
                     {s?.division || "—"}
                   </div>
 
-                  <div className="col-span-1 flex justify-end">
+                  <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-3">
                     <button
                       onClick={() => openStudent(s)}
                       className="text-violet-600 font-medium text-sm hover:underline"
                     >
                       View
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(s)}
+                      title="Delete student"
+                      aria-label={`Delete ${s?.fullName}`}
+                      className="text-red-500 hover:text-red-700 transition"
+                    >
+                      <FaTrashAlt className="text-sm" />
                     </button>
                   </div>
                 </div>
@@ -240,6 +267,22 @@ export default function AllStudents() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddStudent}
+      />
+
+      {/* Delete Student Confirmation */}
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete student?"
+        message={
+          deleteTarget
+            ? `${deleteTarget.fullName} (PRN ${deleteTarget.prn}) will be removed permanently, along with ${deleteTargetComplaints} complaint${
+                deleteTargetComplaints === 1 ? "" : "s"
+              } and all edit requests. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete student"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
 
       {/* Side Drawer */}

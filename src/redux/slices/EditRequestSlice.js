@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { deleteStudent } from "./AuthSlice";
 
 const loadRequests = () => {
   try {
@@ -53,6 +54,16 @@ const EditRequestSlice = createSlice({
       req.status = "Rejected";
       saveRequests(state.list);
     },
+  },
+  extraReducers: (builder) => {
+    // Student delete hua -> uske edit requests bhi hat jaate hain
+    builder.addCase(deleteStudent, (state, action) => {
+      const prn = String(action.payload).trim().toLowerCase();
+      state.list = state.list.filter(
+        (r) => String(r.prn).trim().toLowerCase() !== prn
+      );
+      saveRequests(state.list);
+    });
   },
 });
 
